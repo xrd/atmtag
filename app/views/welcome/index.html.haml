@@ -1,0 +1,15 @@
+.atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()' }
+  .actions
+    .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
+    .btn.btn-large.btn-block Add ATM details
+
+  .alert{ 'ng-show' => 'message' } {{ message }}
+
+
+  #map_canvas{ 'ng-show' => 'results' }
+
+  .results{ 'ng-repeat' => 'result in results' }
+    %h2 {{result.name}}
+    %img{ src: '{{result.icon}}' }
+    {{result.vicinity}}
+    .alert Your cost: ${{cost(result)}}

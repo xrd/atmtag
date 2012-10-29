@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Atmtag</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyAUK68d2RniipR1xI0ZuyibTwQ3gAymuRI&sensor=true"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.2/angular.min.js"></script>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+</head>
+<body ng-app="atmtag">
+
+<div class="container">
+<div class="row">
+<div class="span4 visible-desktop">
+<h1>Atm Tag: save money and time, by finding the cheapest and closest ATM.</h1>
+</div>
+<div class="span4">
+<h2 class="visible-phone">Atm Tag: save money and time, find cheap and close ATMs</h2>
+<%= yield %>
+</div>
+<div class="span4 visible-desktop">
+<h3>Atm Tag works best on your mobile phone.</h3>
+</div>
+</div>
+</div>
+
+</body>
+</html>
