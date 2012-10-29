@@ -1,2 +1,2 @@
-mod = angular.module "atmtag", [] # [ 'ngResource' ]
+mod = angular.module "atmtag", [ 'ngCookies', 'ngResource' ]
 @mod = mod

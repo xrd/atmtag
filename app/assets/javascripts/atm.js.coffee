@@ -1,6 +1,5 @@
-
 class AtmCtrl
-        constructor: ( $scope ) ->
+        constructor: ( $scope, $cookieStore ) ->
                 console.log "Loaded controller"
                 
                 $scope.getCurrentLocation = ( cb ) ->
@@ -29,11 +28,17 @@ class AtmCtrl
                                         $scope.$digest()
 
                 $scope.cost = (result) ->
-                        re = /wells/i
-                        if re.test( result.name )
-                                10
+                        return if $scope.preferences
+                        rv = undefined
+                        if banks = $cookieStore.get( "banks" )
+                                $scope.preferences = true
                         else
-                                5.50
+                                re = /wells/i
+                                if re.test( result.name )
+                                        rv = 10
+                                else
+                                        rv = 5.50
+                        rv
 
                 $scope.initialize = () ->
                         $scope.initializeMap()
