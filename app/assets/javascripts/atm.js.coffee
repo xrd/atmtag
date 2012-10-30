@@ -30,7 +30,7 @@ class AtmCtrl
                 $scope.cost = (result) ->
                         return if $scope.preferences
                         rv = undefined
-                        if banks = $cookieStore.get( "banks" )
+                        unless banks = $cookieStore.get( "banks" )
                                 $scope.preferences = true
                         else
                                 re = /wells/i

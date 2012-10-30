@@ -14,7 +14,6 @@
     {{result.vicinity}}
     .alert Your cost: ${{cost(result)}}
 
-
-  .fade{ "ui-modal" => true, "ng-model" => "preferences" }
+  .modal{ "ui-modal" => true, "ng-model" => "preferences", 'ng-class' => '{ "fade" : !preferences }' }
     We cannot calculate your cost. If you tell us your bank, we can
     determine the cost to use any ATM found.
