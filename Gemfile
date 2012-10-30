@@ -40,4 +40,4 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'debugger'
 
-gem "twitter-bootstrap-rails"
+gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'
