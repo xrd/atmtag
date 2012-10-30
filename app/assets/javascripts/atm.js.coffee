@@ -50,4 +50,5 @@ class AtmCtrl
                                 mapTypeId: google.maps.MapTypeId.ROADMAP
                         $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 
+AtmCtrl.$inject = [ '$scope', '$cookieStore' ]
 @AtmCtrl = AtmCtrl
