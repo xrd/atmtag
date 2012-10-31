@@ -11,6 +11,12 @@ group :development do
   gem "sqlite3"
 end
 
+group :test, :development do
+  gem "rspec-rails", "~> 2.0"
+  gem 'guard-coffeescript'
+  gem 'rb-fsevent', '~> 0.9.1'
+end
+
 # Gems used only for assets and not required
 # in production environments by default.
 group :assets do
@@ -42,6 +48,4 @@ gem 'jquery-rails'
 
 gem 'twitter-bootstrap-rails', :git => 'git://github.com/seyhunak/twitter-bootstrap-rails.git'
 gem 'rails_admin'
-
-
 gem "devise"

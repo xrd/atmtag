@@ -4,7 +4,6 @@ class AtmCtrl
 
                 $scope.banks = {}
                 $scope.banks.all = Bank.query()
-                #                $scope.banks.all = [ { name: 'Foo', state: 'CA' }, { name: "Bar", state: 'OR' } ]
 
                 $scope.hideBanksMessage = () ->
                         Store.save 'hideBanksMessage': true

@@ -1,21 +1,26 @@
 (function() {
 
   describe("An atm controller", function() {
-    var ctrl, httpBackend, scope;
-    ctrl = void 0;
-    scope = void 0;
-    httpBackend = void 0;
+    this.ctrl = void 0;
+    this.scope = void 0;
+    this.httpBackend = void 0;
     beforeEach(module('atmtag'));
     beforeEach(inject(function($controller, $rootScope, $httpBackend) {
-      httpBackend = $httpBackend;
-      httpBackend.whenGET(/.*/).respond(banks);
-      scope = $rootScope.$new();
-      return ctrl = $controller(AtmCtrl, {
-        $scope: scope
+      this.httpBackend = $httpBackend;
+      this.httpBackend.whenGET(/.*/).respond(banks);
+      this.scope = $rootScope.$new();
+      return this.ctrl = $controller(AtmCtrl, {
+        $scope: this.scope
       });
     }));
-    return it("should be able to create itself", function() {
-      return expect(scope.status).toEqual('loading');
+    afterEach(function() {
+      this.httpBackend.verifyNoOutstandingExpectation();
+      return this.httpBackend.verifyNoOutstandingRequest();
+    });
+    return it("should load banks", function() {
+      expect(this.scope.banks.all).toEqual({});
+      this.httpBackend.flush();
+      return expect(this.scope.banks.all[0].name).toEqual("Chris Bank");
     });
   });
 
