@@ -2,8 +2,6 @@ class AtmCtrl
         constructor: ( $scope, Bank, Store, $cookieStore ) ->
                 console.log "Loaded controller"
 
-                $scope.banks = {}
-                $scope.banks.all = Bank.query()
 
                 $scope.hideBanksMessage = () ->
                         Store.save 'hideBanksMessage': true
@@ -55,6 +53,7 @@ class AtmCtrl
                         rv
 
                 $scope.chooseBanks = () ->
+                        console.log "Hi there"
 
                 loadContributorPreference = () ->
                         Store.get "contribute", (result) ->
@@ -62,6 +61,10 @@ class AtmCtrl
                                         Store.save "contribute": "yes"
 
                 $scope.initialize = () ->
+
+                        $scope.banks = {}
+                        $scope.banks.all = Bank.query()
+
                         $scope.preferences = {}
                         Store.get "hideBanksMessage", (response) ->
                                 $scope.preferences.hideBanksMessage = response
@@ -71,7 +74,7 @@ class AtmCtrl
                         $scope.initializeMap()
 
                         # Remove our cloak
-                        $('.cloak').removeClass( 'hidden' )
+                        jQuery('.cloak').removeClass( 'hidden' ) if jQuery?
 
                 $scope.initializeMap = () ->
                         if google? and google.maps?

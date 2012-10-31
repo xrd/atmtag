@@ -6,8 +6,6 @@
     function AtmCtrl($scope, Bank, Store, $cookieStore) {
       var calculateCost, loadContributorPreference;
       console.log("Loaded controller");
-      $scope.banks = {};
-      $scope.banks.all = Bank.query();
       $scope.hideBanksMessage = function() {
         Store.save({
           'hideBanksMessage': true
@@ -76,7 +74,9 @@
         }
         return rv;
       };
-      $scope.chooseBanks = function() {};
+      $scope.chooseBanks = function() {
+        return console.log("Hi there");
+      };
       loadContributorPreference = function() {
         return Store.get("contribute", function(result) {
           if (!($scope.preferences.contribute = result)) {
@@ -87,6 +87,8 @@
         });
       };
       $scope.initialize = function() {
+        $scope.banks = {};
+        $scope.banks.all = Bank.query();
         $scope.preferences = {};
         Store.get("hideBanksMessage", function(response) {
           return $scope.preferences.hideBanksMessage = response;
@@ -96,7 +98,9 @@
           return $scope.preferences.banks = response;
         });
         $scope.initializeMap();
-        return $('.cloak').removeClass('hidden');
+        if (typeof jQuery !== "undefined" && jQuery !== null) {
+          return jQuery('.cloak').removeClass('hidden');
+        }
       };
       $scope.initializeMap = function() {
         var mapOptions;
