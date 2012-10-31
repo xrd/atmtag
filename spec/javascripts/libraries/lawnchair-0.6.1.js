@@ -1,0 +1,1 @@
+../../../app/assets/javascripts/lawnchair-0.6.1.js
