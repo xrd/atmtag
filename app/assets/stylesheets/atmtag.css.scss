@@ -2,3 +2,15 @@
     width: 250px;
     height: 200px;
 }
+
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none;
+}
+
+.banksChooser, .preferencesChooser { 
+min-height: 250px;
+}
+
+.wrapper {
+padding: 2em;
+}

@@ -1,12 +1,19 @@
-.atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()' }
+.atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()', 'ng-show' => 'preferences' }
   .actions
-    .bank.alert.alert-warning{ 'ng-hide' => 'preferences.banks' } Please choose what for banks you have ATM cards. If you do this, we can automatically calculate the cost to using each ATM.
-    .bank.alert{ 'ng-repeat' => 'preferences.banks' }
+    .bank.alert.alert-error{ 'ng-show' => '!preferences.hideBanksMessage && !preferences.banks' } 
+      Selecting your banks allows AtmTag to calculate ATM fees and finds you the closet and least expensive option in your area.
+      .choices
+        .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
+        .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
+    .bank.alert{ 'ng-repeat' => 'bank in preferences.banks' }
       {{bank.name}} 
       %span{ 'ng-click' => 'removeBank(bank)' } x
     .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
+    %small Choosing your bank allows us to calculate the least expensive ATM for you.
     .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
-    .btn.btn-large.btn-block Add ATM details
+    %small Search for the most closest and most inexpensive ATM
+    .btn.btn-large.btn-block{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Set preferences
+    %small Anonymity options, etc.
 
   .alert{ 'ng-show' => 'message' } {{ message }}
 
@@ -17,15 +24,32 @@
     %h2 {{result.name}}
     %img{ "ng-src" => '{{result.icon}}' }
     {{result.vicinity}}
-    .alert Your cost: ${{cost(result)}}
+    .alert Your cost: {{result.fees.amount||'unknown'}}
 
-  .modal{ "ui-modal" => true, "ng-model" => "banks.chooser", 'ng-class' => '{ "fade" : !banks.chooser }' }
-    Show by:
-    %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'byState' } state
-    %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
+  .cloak.hidden
+    .modal{ "ui-modal" => true, "ng-model" => "preferences.chooser", 'ng-class' => '{ "fade" : !preferences.chooser }' }
+      .wrapper.preferencesChooser
+        .btn.btn-inverse.pull-right{ 'ng-click' => 'preferences.chooser = false' } x
+        %legend
+          Contribute information to Atm Tag
+        %label Atm Tag relies on information from users to populate our fees database. If you do not want to contribute this information, you can choose not to share. This information is stored anonymously.
+        %input{ type: 'checkbox', 'ng-model' => 'contribute', 'ng-change' => 'changeContribution()' } Contribute information to AtmTag
+  
+        %legend Reset user token.
+        %label Atm Tag stores your submission with an anonymous user token. You can reset this if you want to disassociate any information submissions (ATM fees you have tagged and banks added) you have made.
+        .btn.btn-block{ 'ng-click' => 'resetUserToken()' } Reset user token
 
-    .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
-      %select{ 'ng-options' => 'b.name for b in banks.all' }
-    .byState{ 'ng-show' => 'banks.display == "byState"' }
-      %select{ 'ng-options' => 'b.name group by b.state for b in banks.all' }
-      
+    .modal{ "ui-modal" => true, "ng-model" => "banks.chooser", 'ng-class' => '{ "fade" : !banks.chooser }' }
+      .wrapper.banksChooser
+        .btn.btn-inverse.pull-right{ 'ng-click' => 'banks.chooser = false' } x
+        %legend Show banks by:
+        %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'byState' } state
+        %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
+    
+        .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
+          %select{ 'ng-options' => 'b.name for b in banks.all' }
+        .byState{ 'ng-show' => 'banks.display == "byState"' }
+          %select{ 'ng-options' => 'b.name group by b.state for b in banks.all' }
+
+    
+  

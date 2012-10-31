@@ -13,5 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require twitter/bootstrap
+//= require lawnchair-0.6.1
 //= require angular
 //= require_tree .
