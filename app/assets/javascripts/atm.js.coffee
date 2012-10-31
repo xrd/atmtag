@@ -1,7 +1,14 @@
 class AtmCtrl
-        constructor: ( $scope, $cookieStore ) ->
+        constructor: ( $scope, Bank, $cookieStore ) ->
                 console.log "Loaded controller"
-                
+
+                $scope.banks = {}
+                $scope.banks.all = Bank.query()
+                #                $scope.banks.all = [ { name: 'Foo', state: 'CA' }, { name: "Bar", state: 'OR' } ]
+
+                $scope.preferences = {}
+                $scope.preferences.banks = [ { name: 'USAA' }, { name: 'Chase' } ]
+                                                
                 $scope.getCurrentLocation = ( cb ) ->
                         if (navigator.geolocation)
                                 navigator.geolocation.getCurrentPosition( cb );
@@ -12,20 +19,24 @@ class AtmCtrl
                                 $scope.message = "Got current location, now searching local ATMs"
                                 # x.innerHTML="Latitude: " + position.coords.latitude +
                                 # "<br>Longitude: " + position.coords.longitude;
-                                service = new google.maps.places.PlacesService($scope.map);
-                                request = {}
-                                request.location = new google.maps.LatLng( position.coords.latitude, position.coords.longitude )
-                                request.radius = 500
-                                request.types = [ 'atm' ]
-                                service.nearbySearch request, (results, status) ->
-                                        if status == google.maps.places.PlacesServiceStatus.OK
-                                                $scope.results = []
-                                                for result in results
-                                                        $scope.results.push result
-                                                $scope.message = "Got results"
-                                        else
-                                                $scope.message = "No results found"
-                                        $scope.$digest()
+                                if google? and google.maps?
+                                        service = new google.maps.places.PlacesService($scope.map);
+                                        request = {}
+                                        request.location = new google.maps.LatLng( position.coords.latitude, position.coords.longitude )
+                                        request.radius = 500
+                                        request.types = [ 'atm' ]
+                                        service.nearbySearch request, (results, status) ->
+                                                if status == google.maps.places.PlacesServiceStatus.OK
+                                                        $scope.results = []
+                                                        for result in results
+                                                                $scope.results.push result
+                                                        $scope.message = "Got results"
+                                                else
+                                                        $scope.message = "No results found"
+                                                $scope.$digest()
+
+                $scope.chooseBanks = () ->
+                        
 
                 $scope.cost = (result) ->
                         return if $scope.preferences
@@ -44,11 +55,12 @@ class AtmCtrl
                         $scope.initializeMap()
 
                 $scope.initializeMap = () ->
-                        mapOptions = 
-                                center: new google.maps.LatLng(-34.397, 150.644),
-                                zoom: 8,
-                                mapTypeId: google.maps.MapTypeId.ROADMAP
-                        $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+                        if google? and google.maps?
+                                mapOptions = 
+                                        center: new google.maps.LatLng(-34.397, 150.644),
+                                        zoom: 8,
+                                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                                $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 
-AtmCtrl.$inject = [ '$scope', '$cookieStore' ]
+AtmCtrl.$inject = [ '$scope', 'Bank', '$cookieStore' ]
 @AtmCtrl = AtmCtrl

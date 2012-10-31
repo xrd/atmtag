@@ -1,5 +1,10 @@
 .atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()' }
   .actions
+    .bank.alert.alert-warning{ 'ng-hide' => 'preferences.banks' } Please choose what for banks you have ATM cards. If you do this, we can automatically calculate the cost to using each ATM.
+    .bank.alert{ 'ng-repeat' => 'preferences.banks' }
+      {{bank.name}} 
+      %span{ 'ng-click' => 'removeBank(bank)' } x
+    .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
     .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
     .btn.btn-large.btn-block Add ATM details
 
@@ -14,6 +19,13 @@
     {{result.vicinity}}
     .alert Your cost: ${{cost(result)}}
 
-  .modal{ "ui-modal" => true, "ng-model" => "preferences", 'ng-class' => '{ "fade" : !preferences }' }
-    We cannot calculate your cost. If you tell us your bank, we can
-    determine the cost to use any ATM found.
+  .modal{ "ui-modal" => true, "ng-model" => "banks.chooser", 'ng-class' => '{ "fade" : !banks.chooser }' }
+    Show by:
+    %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'byState' } state
+    %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
+
+    .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
+      %select{ 'ng-options' => 'b.name for b in banks.all' }
+    .byState{ 'ng-show' => 'banks.display == "byState"' }
+      %select{ 'ng-options' => 'b.name group by b.state for b in banks.all' }
+      
