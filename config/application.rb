@@ -57,6 +57,7 @@ module Atmtag
     config.assets.enabled = true
 
     # For rails admin
+    config.assets.initialize_on_precompile = false
     config.assets.precompile += ['rails_admin/rails_admin.css', 'rails_admin/rails_admin.js']
     
     # Version of your assets, change this if you want to expire all your assets
