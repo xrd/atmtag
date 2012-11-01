@@ -5,9 +5,11 @@
       .choices
         .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
         .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
-    %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
-      {{bank.name}} 
-      %span{ 'ng-click' => 'removeBank(bank)' } x
+    .myatms{ 'ng-show' => 'preferences.banks' }
+      My ATM cards:
+      %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
+        {{bank.name}} 
+        %span{ 'ng-click' => 'removeBank(bank)' } x
     .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
     %small Choosing your bank allows us to calculate the least expensive ATM for you.
     .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
@@ -24,7 +26,7 @@
     %h2 {{result.name}}
     %img{ "ng-src" => '{{result.icon}}' }
     {{result.vicinity}}
-    .alert Your cost: {{result.fees.amount||'unknown'}}
+    .alert Your cost: {{result.fees.amount|currency}}
 
   .cloak.hidden
     .modal{ "ui-modal" => true, "ng-model" => "preferences.chooser", 'ng-class' => '{ "fade" : !preferences.chooser }' }

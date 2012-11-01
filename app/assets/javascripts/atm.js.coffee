@@ -24,29 +24,33 @@ class AtmCtrl
                                         request.types = [ 'atm' ]
                                         service.nearbySearch request, (results, status) ->
                                                 if status == google.maps.places.PlacesServiceStatus.OK
-                                                        $scope.results = []
-                                                        for result in results
-                                                                # Calculate cost
-                                                                for bank in $scope.banks.all
-                                                                        fee = calculateCost( bank.average_fee )
-                                                                        # vbc == validated by count
-                                                                        vbc = bank.validated_by_count
-                                                                        result.fees = { amount: fee, vbc: vbc }
-                                                                $scope.results.push result
+                                                        $scope.results = results
+                                                        $scope.calculateFeesForResults()
                                                         $scope.message = "Got results"
                                                 else
                                                         $scope.message = "No results found"
                                                 $scope.$digest()
 
-                calculateCost = ( averageFee, name ) ->
+                $scope.calculateFeesForResults = () ->
+                        # Calculate cost
+                        for bank in $scope.banks.all
+                                for gBank in $scope.results
+                                        fee = calculateCost( gBank, bank )
+                                        # vbc == validated by count
+                                        vbc = bank.validated_by_count
+                                        gBank.fees = { amount: fee, vbc: vbc }
+
+                calculateCost = ( gBank, bank ) ->
                         # my withdrawal fee
-                        mwf = $scope.preferences.mwf
-                        af = parseFloat( averageFee ) || 0.0
+                        mwf = $scope.preferences.mwf || 2.5
+                        af = parseFloat( bank.averageFee ) || 2.5
                         rv = -1
                         # Lookup our banks, and assign fees
                         if $scope.preferences.banks
-                                for bank in $scope.preferences.banks
-                                        if $scope.match( bank, name )
+                                for myBank in $scope.preferences.banks
+                                        # console.log "Got a match of our bank #{myBank.name} / #{gBank.name}!"
+                                        if $scope.match( myBank.name, gBank.name )
+                                                console.log "Got a match of our bank #{myBank.name} / #{gBank.name}!"
                                                 rv = 0.0
                         rv = ( af + mwf ) if -1 == rv
                         rv
@@ -61,11 +65,8 @@ class AtmCtrl
                         unless rv
                                 rv = ( -1 != name.indexOf( bank ) ) || ( -1 != bank.indexOf( name ) )
                         unless rv
-                                console.log "Looking for whitespace differences"
-                                # remove whitespace and retry
                                 nw_bank = bank.replace /\W+/, ''
                                 nw_name = name.replace /\W+/, ''
-                                console.log "Looking at #{nw_bank} vs #{nw_name}"
                                 rv = nw_name == nw_bank
                                 unless rv
                                         rv = ( -1 != nw_name.indexOf( nw_bank ) ) || ( -1 != nw_bank.indexOf( nw_name ) )
@@ -106,6 +107,8 @@ class AtmCtrl
                         $scope.preferences.banks ||= [] 
                         $scope.preferences.banks.push $scope.bank
                         $scope.bank = undefined
+                        # recalculate fees
+                        $scope.calculateFeesForResults()
                                 
                 $scope.initialize = () ->
                         $scope.loadBanks()

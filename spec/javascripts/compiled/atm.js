@@ -27,23 +27,9 @@
             request.radius = 500;
             request.types = ['atm'];
             return service.nearbySearch(request, function(results, status) {
-              var bank, fee, result, vbc, _i, _j, _len, _len1, _ref;
               if (status === google.maps.places.PlacesServiceStatus.OK) {
-                $scope.results = [];
-                for (_i = 0, _len = results.length; _i < _len; _i++) {
-                  result = results[_i];
-                  _ref = $scope.banks.all;
-                  for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-                    bank = _ref[_j];
-                    fee = calculateCost(bank.average_fee);
-                    vbc = bank.validated_by_count;
-                    result.fees = {
-                      amount: fee,
-                      vbc: vbc
-                    };
-                  }
-                  $scope.results.push(result);
-                }
+                $scope.results = results;
+                $scope.calculateFeesForResults();
                 $scope.message = "Got results";
               } else {
                 $scope.message = "No results found";
@@ -53,16 +39,41 @@
           }
         });
       };
-      calculateCost = function(averageFee, name) {
-        var af, bank, mwf, rv, _i, _len, _ref;
-        mwf = $scope.preferences.mwf;
-        af = parseFloat(averageFee) || 0.0;
+      $scope.calculateFeesForResults = function() {
+        var bank, fee, gBank, vbc, _i, _len, _ref, _results;
+        _ref = $scope.banks.all;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          bank = _ref[_i];
+          _results.push((function() {
+            var _j, _len1, _ref1, _results1;
+            _ref1 = $scope.results;
+            _results1 = [];
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              gBank = _ref1[_j];
+              fee = calculateCost(gBank, bank);
+              vbc = bank.validated_by_count;
+              _results1.push(gBank.fees = {
+                amount: fee,
+                vbc: vbc
+              });
+            }
+            return _results1;
+          })());
+        }
+        return _results;
+      };
+      calculateCost = function(gBank, bank) {
+        var af, mwf, myBank, rv, _i, _len, _ref;
+        mwf = $scope.preferences.mwf || 2.5;
+        af = parseFloat(bank.averageFee) || 2.5;
         rv = -1;
         if ($scope.preferences.banks) {
           _ref = $scope.preferences.banks;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            bank = _ref[_i];
-            if ($scope.match(bank, name)) {
+            myBank = _ref[_i];
+            if ($scope.match(myBank.name, gBank.name)) {
+              console.log("Got a match of our bank " + myBank.name + " / " + gBank.name + "!");
               rv = 0.0;
             }
           }
@@ -85,10 +96,8 @@
           rv = (-1 !== name.indexOf(bank)) || (-1 !== bank.indexOf(name));
         }
         if (!rv) {
-          console.log("Looking for whitespace differences");
           nw_bank = bank.replace(/\W+/, '');
           nw_name = name.replace(/\W+/, '');
-          console.log("Looking at " + nw_bank + " vs " + nw_name);
           rv = nw_name === nw_bank;
           if (!rv) {
             rv = (-1 !== nw_name.indexOf(nw_bank)) || (-1 !== nw_bank.indexOf(nw_name));
@@ -136,7 +145,8 @@
         var _base;
         (_base = $scope.preferences).banks || (_base.banks = []);
         $scope.preferences.banks.push($scope.bank);
-        return $scope.bank = void 0;
+        $scope.bank = void 0;
+        return $scope.calculateFeesForResults();
       };
       $scope.initialize = function() {
         $scope.loadBanks();
