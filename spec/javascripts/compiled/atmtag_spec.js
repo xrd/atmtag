@@ -39,7 +39,7 @@
       httpBackend.verifyNoOutstandingExpectation();
       return httpBackend.verifyNoOutstandingRequest();
     });
-    describe("#banks", function() {
+    xdescribe("#banks", function() {
       it("should load banks", function() {
         expect(scope.banks).toEqual(void 0);
         scope.initialize();
@@ -48,7 +48,7 @@
       });
       return void 0;
     });
-    describe("#costs", function() {
+    xdescribe("#costs", function() {
       return it("should layer cost estimations based on selected banks", function() {
         scope.initialize();
         httpBackend.flush();
@@ -56,7 +56,29 @@
         return console.log("Hey, layering costs");
       });
     });
-    describe("#preferences", function() {
+    describe("#match", function() {
+      it("should match two banks with the same name", function() {
+        return expect(scope.match("Chase", "Chase")).toBeTruthy();
+      });
+      it("should not match two banks with different names", function() {
+        return expect(scope.match("Wells Fargo", "Chase")).toBeFalsy();
+      });
+      it("should match with different whitespace or punctuation", function() {
+        return expect(scope.match("Chase   ", "Chase")).toBeTruthy();
+      });
+      it("should match partial names", function() {
+        expect(scope.match("Chase Bank", "Chase")).toBeTruthy();
+        expect(scope.match("Chase ", "Chase Bank")).toBeTruthy();
+        return expect(scope.match("Chase       ", "Chase Bank           ")).toBeTruthy();
+      });
+      it("should not match partial names with stuff in the middle", function() {
+        return expect(scope.match("Chase XXX Bank", "Chase Bank")).toBeFalsy();
+      });
+      return it("should match regardless of case", function() {
+        return expect(scope.match("CHaSe", "ChASE BAnK")).toBeTruthy();
+      });
+    });
+    xdescribe("#preferences", function() {
       xit("should store and nuke settings", function() {
         var all;
         console.log("Checking interface for lanwchair");

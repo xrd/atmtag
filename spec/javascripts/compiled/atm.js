@@ -62,13 +62,37 @@
           _ref = $scope.preferences.banks;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             bank = _ref[_i];
-            if (match(bank, name)) {
+            if ($scope.match(bank, name)) {
               rv = 0.0;
             }
           }
         }
         if (-1 === rv) {
           rv = af + mwf;
+        }
+        return rv;
+      };
+      $scope.match = function(bank_mixed, name_mixed) {
+        var bank, name, nw_bank, nw_name, rv;
+        if (!(bank_mixed && name_mixed)) {
+          return false;
+        }
+        name = name_mixed.toLowerCase();
+        bank = bank_mixed.toLowerCase();
+        rv = false;
+        rv = bank === name;
+        if (!rv) {
+          rv = (-1 !== name.indexOf(bank)) || (-1 !== bank.indexOf(name));
+        }
+        if (!rv) {
+          console.log("Looking for whitespace differences");
+          nw_bank = bank.replace(/\W+/, '');
+          nw_name = name.replace(/\W+/, '');
+          console.log("Looking at " + nw_bank + " vs " + nw_name);
+          rv = nw_name === nw_bank;
+          if (!rv) {
+            rv = (-1 !== nw_name.indexOf(nw_bank)) || (-1 !== nw_bank.indexOf(nw_name));
+          }
         }
         return rv;
       };

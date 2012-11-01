@@ -46,9 +46,29 @@ class AtmCtrl
                         # Lookup our banks, and assign fees
                         if $scope.preferences.banks
                                 for bank in $scope.preferences.banks
-                                        if match( bank, name )
+                                        if $scope.match( bank, name )
                                                 rv = 0.0
                         rv = ( af + mwf ) if -1 == rv
+                        rv
+
+                $scope.match = (bank_mixed, name_mixed) ->
+                        return false unless bank_mixed and name_mixed
+                        
+                        name = name_mixed.toLowerCase()
+                        bank = bank_mixed.toLowerCase()
+                        rv = false
+                        rv = bank == name
+                        unless rv
+                                rv = ( -1 != name.indexOf( bank ) ) || ( -1 != bank.indexOf( name ) )
+                        unless rv
+                                console.log "Looking for whitespace differences"
+                                # remove whitespace and retry
+                                nw_bank = bank.replace /\W+/, ''
+                                nw_name = name.replace /\W+/, ''
+                                console.log "Looking at #{nw_bank} vs #{nw_name}"
+                                rv = nw_name == nw_bank
+                                unless rv
+                                        rv = ( -1 != nw_name.indexOf( nw_bank ) ) || ( -1 != nw_bank.indexOf( nw_name ) )
                         rv
 
                 $scope.chooseBanks = () ->

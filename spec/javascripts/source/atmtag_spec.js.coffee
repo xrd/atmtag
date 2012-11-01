@@ -27,7 +27,7 @@ describe "AtmCtrl", () ->
             httpBackend.verifyNoOutstandingExpectation()
             httpBackend.verifyNoOutstandingRequest()
 
-        describe "#banks", () ->
+        xdescribe "#banks", () ->
                 it "should load banks", () ->
                         expect( scope.banks ).toEqual undefined
                         scope.initialize()
@@ -35,14 +35,37 @@ describe "AtmCtrl", () ->
                         expect( scope.banks.all[0].name ).toEqual "Chris Bank"
                 undefined
 
-        describe "#costs", () ->
-                it "should layer cost estimations based on selected banks", () ->
+        xdescribe "#costs", () ->
+                it "should layer cost estimations based on selected banks", ->
                         scope.initialize()
                         httpBackend.flush()
                         expect( scope.banks.all[0].cost ).toEqual undefined
                         console.log "Hey, layering costs"
 
-        describe "#preferences", () ->
+        describe "#match", () ->
+                
+                it "should match two banks with the same name", ->
+                        expect( scope.match( "Chase", "Chase" ) ).toBeTruthy()
+
+                it "should not match two banks with different names", ->
+                        expect( scope.match( "Wells Fargo", "Chase" ) ).toBeFalsy()
+
+                it "should match with different whitespace or punctuation", ->
+                        expect( scope.match( "Chase   ", "Chase" ) ).toBeTruthy()
+
+                it "should match partial names", ->
+                        expect( scope.match( "Chase Bank", "Chase" ) ).toBeTruthy()
+                        expect( scope.match( "Chase ", "Chase Bank" ) ).toBeTruthy()
+                        expect( scope.match( "Chase       ", "Chase Bank           " ) ).toBeTruthy()
+
+                it "should not match partial names with stuff in the middle", ->
+                        expect( scope.match( "Chase XXX Bank", "Chase Bank" ) ).toBeFalsy()
+
+                it "should match regardless of case", ->
+                        expect( scope.match( "CHaSe", "ChASE BAnK" ) ).toBeTruthy()
+
+                        
+        xdescribe "#preferences", () ->
                 # WTF, this is failing
                 xit "should store and nuke settings", () ->
                         console.log "Checking interface for lanwchair"
