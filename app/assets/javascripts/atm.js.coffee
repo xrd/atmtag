@@ -79,8 +79,14 @@ class AtmCtrl
 
                 $scope.loadBanks = () ->
                         $scope.banks = {}
-                        $scope.banks.all = Bank.query()
+                        Bank.query (response) ->
+                                $scope.banks.all = response
 
+                $scope.addBank = () ->
+                        $scope.preferences.banks ||= [] 
+                        $scope.preferences.banks.push $scope.bank
+                        $scope.bank = undefined
+                                
                 $scope.initialize = () ->
                         $scope.loadBanks()
                         $scope.loadPreferences()

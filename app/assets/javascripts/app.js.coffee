@@ -13,7 +13,7 @@ mod.factory 'Preferences', [ (store) ->
                 store.get = ( key, cb ) ->
                         console.log "Getting preference for: #{key}"
                         lawnchair.get "preferences."+key, (response) ->
-                                value = response[key] if response?
+                                value = response[key].value if response? and response[key]
                                 console.log "Got preferences.#{key} => #{value}"
                                 cb(value)
                 store.set = ( key, value ) ->

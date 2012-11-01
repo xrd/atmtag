@@ -1,17 +1,17 @@
 .atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()', 'ng-show' => 'preferences' }
   .actions
     .bank.alert.alert-error{ 'ng-show' => '!preferences.hideBanksMessage && !preferences.banks' } 
-      Selecting your banks allows AtmTag to calculate ATM fees and finds you the closet and least expensive option in your area.
+      Select your banks and AtmTag will calculate ATM fees for each ATM we find near you.
       .choices
         .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
         .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
-    .bank.alert{ 'ng-repeat' => 'bank in preferences.banks' }
+    %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
       {{bank.name}} 
       %span{ 'ng-click' => 'removeBank(bank)' } x
     .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
     %small Choosing your bank allows us to calculate the least expensive ATM for you.
     .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
-    %small Search for the most closest and most inexpensive ATM
+    %small Search for the most closest, cheapeast ATM
     .btn.btn-large.btn-block{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Set preferences
     %small Anonymity options, etc.
 
@@ -42,14 +42,17 @@
     .modal{ "ui-modal" => true, "ng-model" => "banks.chooser", 'ng-class' => '{ "fade" : !banks.chooser }' }
       .wrapper.banksChooser
         .btn.btn-inverse.pull-right{ 'ng-click' => 'banks.chooser = false' } x
+        %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
+          {{bank.name}} 
+          %span{ 'ng-click' => 'removeBank(bank)' } x
         %legend Show banks by:
         %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'byState' } state
         %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
     
         .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
-          %select{ 'ng-options' => 'b.name for b in banks.all' }
+          %select{ 'ng-options' => 'b.name for b in banks.all | orderBy:"name"', 'ng-change' => 'addBank()', 'ng-model' => 'bank' }
         .byState{ 'ng-show' => 'banks.display == "byState"' }
-          %select{ 'ng-options' => 'b.name group by b.state for b in banks.all' }
+          %select{ 'ng-change' => 'addBank()', 'ng-model' => 'bank', 'ng-options' => 'b.name group by b.state for b in banks.all | orderBy:["state","name"]' }
 
     
   

@@ -23,8 +23,8 @@
           console.log("Getting preference for: " + key);
           return lawnchair.get("preferences." + key, function(response) {
             var value;
-            if (response != null) {
-              value = response[key];
+            if ((response != null) && response[key]) {
+              value = response[key].value;
             }
             console.log("Got preferences." + key + " => " + value);
             return cb(value);

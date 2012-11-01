@@ -104,7 +104,15 @@
       };
       $scope.loadBanks = function() {
         $scope.banks = {};
-        return $scope.banks.all = Bank.query();
+        return Bank.query(function(response) {
+          return $scope.banks.all = response;
+        });
+      };
+      $scope.addBank = function() {
+        var _base;
+        (_base = $scope.preferences).banks || (_base.banks = []);
+        $scope.preferences.banks.push($scope.bank);
+        return $scope.bank = void 0;
       };
       $scope.initialize = function() {
         $scope.loadBanks();
