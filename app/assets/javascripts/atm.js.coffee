@@ -1,10 +1,9 @@
 class AtmCtrl
-        constructor: ( $scope, Bank, Store, $cookieStore ) ->
+        constructor: ( $scope, Bank, Preferences, $cookieStore ) ->
                 console.log "Loaded controller"
 
-
                 $scope.hideBanksMessage = () ->
-                        Store.save 'hideBanksMessage': true
+                        Preferences.set 'hideBanksMessage', true
                         $scope.preferences.hideBanksMessage = true
                                                                                                        
                 $scope.getCurrentLocation = ( cb ) ->
@@ -56,21 +55,35 @@ class AtmCtrl
                         console.log "Hi there"
 
                 loadContributorPreference = () ->
-                        Store.get "contribute", (result) ->
-                                unless $scope.preferences.contribute = result
-                                        Store.save "contribute": "yes"
+                        Preferences.get "contribute", (result) ->
+                                console.log "Retrieving contribute #{result}"
+                                $scope.preferences.contribute = result
+                                unless result
+                                        Preferences.set "contribute", "yes"
+                                        $scope.preferences.contribute = "yes"
+                                else
+                                        console.log "Defined: #{$scope.preferences.contribute}"
 
-                $scope.initialize = () ->
+                $scope.loadPreferences = () ->
+                        console.log "Loading preferences"
+                        $scope.preferences = {}
+                        console.log "Getting banks message"
+                        Preferences.get "hideBanksMessage", (response) ->
+                                console.log "Retrieving preferences for banks: #{response}"
+                                $scope.preferences.hideBanksMessage = response
+                        console.log "Getting contributor message"
+                        loadContributorPreference()
+                        Preferences.get "banks", (response) ->
+                                console.log "Retrieving preferences for all banks: #{response}"
+                                $scope.preferences.banks = response
 
+                $scope.loadBanks = () ->
                         $scope.banks = {}
                         $scope.banks.all = Bank.query()
 
-                        $scope.preferences = {}
-                        Store.get "hideBanksMessage", (response) ->
-                                $scope.preferences.hideBanksMessage = response
-                        loadContributorPreference()
-                        Store.get "banks", (response) ->
-                                $scope.preferences.banks = response
+                $scope.initialize = () ->
+                        $scope.loadBanks()
+                        $scope.loadPreferences()
                         $scope.initializeMap()
 
                         # Remove our cloak
@@ -84,5 +97,5 @@ class AtmCtrl
                                         mapTypeId: google.maps.MapTypeId.ROADMAP
                                 $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
 
-AtmCtrl.$inject = [ '$scope', 'Bank', 'Store', '$cookieStore' ]
+AtmCtrl.$inject = [ '$scope', 'Bank', 'Preferences', '$cookieStore' ]
 @AtmCtrl = AtmCtrl

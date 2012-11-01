@@ -11,13 +11,37 @@
     }
   ]);
 
-  mod.factory('Store', [
+  mod.factory('Preferences', [
     function(store) {
-      return new Lawnchair({
+      console.log("Creating store service (lawnchair)");
+      store = {};
+      Lawnchair({
         name: 'atmtag'
-      }, function(store) {
-        return store;
+      }, function(lawnchair) {
+        store = {};
+        store.get = function(key, cb) {
+          console.log("Getting preference for: " + key);
+          return lawnchair.get("preferences." + key, function(response) {
+            var value;
+            if (response != null) {
+              value = response[key];
+            }
+            console.log("Got preferences." + key + " => " + value);
+            return cb(value);
+          });
+        };
+        return store.set = function(key, value) {
+          console.log("Setting preference for: " + key + " to " + value);
+          return lawnchair.get("preferences." + key, function(response) {
+            if (!response) {
+              response = {};
+            }
+            response[key] = value;
+            return lawnchair.save(response);
+          });
+        };
       });
+      return store;
     }
   ]);
 

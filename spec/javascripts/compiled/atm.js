@@ -3,13 +3,11 @@
 
   AtmCtrl = (function() {
 
-    function AtmCtrl($scope, Bank, Store, $cookieStore) {
+    function AtmCtrl($scope, Bank, Preferences, $cookieStore) {
       var calculateCost, loadContributorPreference;
       console.log("Loaded controller");
       $scope.hideBanksMessage = function() {
-        Store.save({
-          'hideBanksMessage': true
-        });
+        Preferences.set('hideBanksMessage', true);
         return $scope.preferences.hideBanksMessage = true;
       };
       $scope.getCurrentLocation = function(cb) {
@@ -78,25 +76,39 @@
         return console.log("Hi there");
       };
       loadContributorPreference = function() {
-        return Store.get("contribute", function(result) {
-          if (!($scope.preferences.contribute = result)) {
-            return Store.save({
-              "contribute": "yes"
-            });
+        return Preferences.get("contribute", function(result) {
+          console.log("Retrieving contribute " + result);
+          $scope.preferences.contribute = result;
+          if (!result) {
+            Preferences.set("contribute", "yes");
+            return $scope.preferences.contribute = "yes";
+          } else {
+            return console.log("Defined: " + $scope.preferences.contribute);
           }
         });
       };
-      $scope.initialize = function() {
-        $scope.banks = {};
-        $scope.banks.all = Bank.query();
+      $scope.loadPreferences = function() {
+        console.log("Loading preferences");
         $scope.preferences = {};
-        Store.get("hideBanksMessage", function(response) {
+        console.log("Getting banks message");
+        Preferences.get("hideBanksMessage", function(response) {
+          console.log("Retrieving preferences for banks: " + response);
           return $scope.preferences.hideBanksMessage = response;
         });
+        console.log("Getting contributor message");
         loadContributorPreference();
-        Store.get("banks", function(response) {
+        return Preferences.get("banks", function(response) {
+          console.log("Retrieving preferences for all banks: " + response);
           return $scope.preferences.banks = response;
         });
+      };
+      $scope.loadBanks = function() {
+        $scope.banks = {};
+        return $scope.banks.all = Bank.query();
+      };
+      $scope.initialize = function() {
+        $scope.loadBanks();
+        $scope.loadPreferences();
         $scope.initializeMap();
         if (typeof jQuery !== "undefined" && jQuery !== null) {
           return jQuery('.cloak').removeClass('hidden');
@@ -119,7 +131,7 @@
 
   })();
 
-  AtmCtrl.$inject = ['$scope', 'Bank', 'Store', '$cookieStore'];
+  AtmCtrl.$inject = ['$scope', 'Bank', 'Preferences', '$cookieStore'];
 
   this.AtmCtrl = AtmCtrl;
 
