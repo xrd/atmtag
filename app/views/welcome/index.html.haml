@@ -33,8 +33,9 @@
     #map_canvas
 
     .results{ 'ng-repeat' => 'result in results | orderBy:order', 'ng-class-even' => '"evenBank"', 'ng-class-odd' => '"oddBank"' }
-      %h2 {{result.name}}
-      %img{ "ng-src" => '{{result.icon}}' }
+      %h4 
+        {{result.name}}
+        %img{ "ng-src" => '{{result.icon}}' }
       {{result.vicinity}}
       .distance {{result.distance|number:2 }} km. away
       .alert Your cost: {{result.fees.amount|currency}}

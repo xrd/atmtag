@@ -32,7 +32,7 @@ class AtmCtrl
                                                         $scope.results = results
                                                         $scope.calculateFeesForResults()
                                                         $scope.calculateDistances(position.coords)
-                                                        $scope.message = "Got results"
+                                                        $scope.message = ""
                                                         # Just shrink the search...
                                                         #$location.hash('results')
                                                         #$anchorScroll()
