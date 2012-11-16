@@ -4,14 +4,31 @@
     display: none;
 }
 
-[ng\:cloak], [ng-cloak], .ng-cloak {
-  display: none;
-}
-
 .banksChooser, .preferencesChooser { 
 /* min-height: 250px; */
 }
 
 .wrapper {
 padding: 2em;
+}
+
+.myatms, .banksChooser {
+    .bank {  
+        display: inline-block;
+    }
+}
+
+$bank: #fbfbfb;
+.evenBank {
+background-color: lighten( $bank, 20% );
+}
+
+.oddBank {
+background-color: darken( $bank, 20% );
+}
+
+.extras {
+.extra {
+    display: inline-block;
+}
 }

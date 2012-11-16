@@ -1,63 +1,43 @@
-.atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()', 'ng-show' => 'preferences' }
-
-  {{ preferences | json }}
-  {{ banks.chooser | json }}
-
+.atm
   .actions
     .bank.alert.alert-error{ 'ng-show' => '!preferences.hideBanksMessage && !preferences.banks' } 
       Select your banks and AtmTag will calculate ATM fees for each ATM we find near you.
       .choices
         .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
         .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
+    .large{ 'ng-hide' => 'results' }
+      .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
+      %small Choosing your bank allows us to calculate the least expensive ATM for you.
+      .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
+      %small Search for the most closest, cheapeast ATM
+      .btn.btn-large.btn-block{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Set preferences
+      %small Anonymity options, etc.
+    .small{ 'ng-show' => 'results' }
+      .btn-group
+        .btn.btn-large{ 'ng-click' => 'banks.chooser = !banks.chooser' } Banks
+        .btn.btn-large{ 'ng-click' => 'search()' } Search
+        .btn.btn-large{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Preferences
     .myatms{ 'ng-show' => 'preferences.banks' }
       My ATM cards:
       %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
         {{bank.name}} 
         %span{ 'ng-click' => 'removeBank(bank)' } x
-    .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
-    %small Choosing your bank allows us to calculate the least expensive ATM for you.
-    .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
-    %small Search for the most closest, cheapeast ATM
-    .btn.btn-large.btn-block{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Set preferences
-    %small Anonymity options, etc.
 
   .alert{ 'ng-show' => 'message' } {{ message }}
 
-  #map_canvas{ 'ng-show' => 'results' }
+  #results{ 'ng-show' => 'results' }
+    Order by: 
+    %span.btn-group
+      .btn{ 'ng-click' => 'order = "distance"' } Distance
+      .btn{ 'ng-click' => 'order = "fees.amount"' } Cost
+    #map_canvas
 
-  .results{ 'ng-repeat' => 'result in results' }
-    %h2 {{result.name}}
-    %img{ "ng-src" => '{{result.icon}}' }
-    {{result.vicinity}}
-    .alert Your cost: {{result.fees.amount|currency}}
+    .results{ 'ng-repeat' => 'result in results | orderBy:order', 'ng-class-even' => '"evenBank"', 'ng-class-odd' => '"oddBank"' }
+      %h2 {{result.name}}
+      %img{ "ng-src" => '{{result.icon}}' }
+      {{result.vicinity}}
+      .distance {{result.distance|number:2 }} km. away
+      .alert Your cost: {{result.fees.amount|currency}}
+      .extras
+        %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}
 
-  .cloak-disabled
-    #preferences.fade{ "ui-modal" => true, "ng-model" => "preferences.chooser" }
-      .wrapper.preferencesChooser
-        .btn.btn-inverse.pull-right{ 'ng-click' => 'preferences.chooser = false' } x
-        %legend
-          Contribute information to Atm Tag
-        %label Atm Tag relies on information from users to populate our fees database. If you do not want to contribute this information, you can choose not to share. This information is stored anonymously.
-        %input{ type: 'checkbox', 'ng-model' => 'contribute', 'ng-change' => 'changeContribution()' } Contribute information to AtmTag
-  
-        %legend Reset user token.
-        %label Atm Tag stores your submission with an anonymous user token. You can reset this if you want to disassociate any information submissions (ATM fees you have tagged and banks added) you have made.
-        .btn.btn-block{ 'ng-click' => 'resetUserToken()' } Reset user token
-
-    #banks.fade{ "ui-modal" => true, "ng-model" => "banks.chooser" }
-      .wrapper.banksChooser
-        .btn.btn-inverse.pull-right{ 'ng-click' => 'banks.chooser = false' } x
-        %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
-          {{bank.name}} 
-          %span{ 'ng-click' => 'removeBank(bank)' } x
-        %legend Show banks by:
-        %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'byState' } state
-        %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
-    
-        .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
-          %select{ 'ng-options' => 'b.name for b in banks.all | orderBy:"name"', 'ng-change' => 'addBank()', 'ng-model' => 'bank' }
-        .byState{ 'ng-show' => 'banks.display == "byState"' }
-          %select{ 'ng-change' => 'addBank()', 'ng-model' => 'bank', 'ng-options' => 'b.name group by b.state for b in banks.all | orderBy:["state","name"]' }
-
-    
-  
