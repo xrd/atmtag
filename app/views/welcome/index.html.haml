@@ -1,4 +1,8 @@
 .atm{ 'ng-controller' => 'AtmCtrl', 'ng-init' => 'initialize()', 'ng-show' => 'preferences' }
+
+  {{ preferences | json }}
+  {{ banks.chooser | json }}
+
   .actions
     .bank.alert.alert-error{ 'ng-show' => '!preferences.hideBanksMessage && !preferences.banks' } 
       Select your banks and AtmTag will calculate ATM fees for each ATM we find near you.
@@ -19,7 +23,6 @@
 
   .alert{ 'ng-show' => 'message' } {{ message }}
 
-
   #map_canvas{ 'ng-show' => 'results' }
 
   .results{ 'ng-repeat' => 'result in results' }
@@ -28,8 +31,8 @@
     {{result.vicinity}}
     .alert Your cost: {{result.fees.amount|currency}}
 
-  .cloak.hidden
-    .modal{ "ui-modal" => true, "ng-model" => "preferences.chooser", 'ng-class' => '{ "fade" : !preferences.chooser }' }
+  .cloak-disabled
+    #preferences.fade{ "ui-modal" => true, "ng-model" => "preferences.chooser" }
       .wrapper.preferencesChooser
         .btn.btn-inverse.pull-right{ 'ng-click' => 'preferences.chooser = false' } x
         %legend
@@ -41,7 +44,7 @@
         %label Atm Tag stores your submission with an anonymous user token. You can reset this if you want to disassociate any information submissions (ATM fees you have tagged and banks added) you have made.
         .btn.btn-block{ 'ng-click' => 'resetUserToken()' } Reset user token
 
-    .modal{ "ui-modal" => true, "ng-model" => "banks.chooser", 'ng-class' => '{ "fade" : !banks.chooser }' }
+    #banks.fade{ "ui-modal" => true, "ng-model" => "banks.chooser" }
       .wrapper.banksChooser
         .btn.btn-inverse.pull-right{ 'ng-click' => 'banks.chooser = false' } x
         %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }

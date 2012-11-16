@@ -1,4 +1,4 @@
-mod = angular.module "atmtag", [ 'ngCookies', 'ngResource' ]
+mod = angular.module "atmtag", [ 'ngCookies', 'ngResource', 'ui' ]
 @mod = mod
 
 mod.factory 'Bank', [ '$resource', ($resource) ->
@@ -23,4 +23,4 @@ mod.factory 'Preferences', [ (store) ->
                                 response[key] = value
                                 lawnchair.save response
         store
-        ]                
+        ]
