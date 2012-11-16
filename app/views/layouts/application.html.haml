@@ -11,13 +11,13 @@
     = javascript_include_tag "application"
     = csrf_meta_tags
   %body{"ng-app" => "atmtag", "ng-controller" => "AtmCtrl", "ng-init" => "initialize()", "ng-show" => "preferences"}
-    .container
+    .container-fluid
       .row
-        .span4.visible-desktop
-          %h1 Atm Tag: save money and time, by finding the closest, cheapest ATM.
+        .span4.hidden-phone
+          %h1 Atm Tag: save money and time. Find the closest and cheapest ATMs.
         .span4
           = render partial: 'layouts/dialogs'
-          %h2.visible-phone{"ng-hide" => "results"} Atm Tag: save money and time, find cheap and close ATMs
+          %h2.visible-phone{ "ng-hide" => "results" } Atm Tag: save money and time. Find the closest and cheapest ATMs.
           = yield
-        .span4.visible-desktop
+        .span4.hidden-phone
           %h3 Atm Tag works best on your mobile phone.

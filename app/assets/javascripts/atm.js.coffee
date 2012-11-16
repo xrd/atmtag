@@ -2,6 +2,7 @@ class AtmCtrl
         constructor: ( $scope, Bank, Preferences, $cookieStore, $location, $anchorScroll ) ->
                 console.log "Loaded controller"
 
+                $scope.attempted = false
                 $scope.radius = 500
                 $scope.metric = false
 
@@ -10,9 +11,14 @@ class AtmCtrl
                                 console.log "channging contribution"
                                 Preferences.set "contribute", newVal
 
-                $scope.changeRadius = () ->
-                        if radius = prompt "Enter the search radius (in meters)"
-                                $scope.radius = radius
+                $scope.changeRadius = (count) ->
+                        unless count
+                                if radius = prompt "Enter the search radius (in meters)"
+                                        $scope.radius = radius
+                                        $scope.search()
+                        else
+                                $scope.radius = count
+                                $scope.search()
 
                 $scope.convert = (distance) ->
                         if $scope.metric
@@ -41,6 +47,7 @@ class AtmCtrl
                                         request.radius = $scope.radius
                                         request.types = [ 'atm' ]
                                         service.nearbySearch request, (results, status) ->
+                                                $scope.attempted = true
                                                 if status == google.maps.places.PlacesServiceStatus.OK
                                                         $scope.results = results
                                                         $scope.calculateFeesForResults()
@@ -74,6 +81,11 @@ class AtmCtrl
                                 c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
                                 d = R * c
                                 result.distance = d
+
+                $scope.help = (result) ->
+                        if fee = prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
+                                Bank.fee {}, { fee: fee }, (response) ->
+                                        alert( "Thanks" )
 
                 $scope.calculateFeesForResults = () ->
                         # Calculate cost
@@ -172,6 +184,7 @@ class AtmCtrl
                                 if -1 != toRemove = $scope.preferences.banks.indexOf( bank )
                                         $scope.preferences.banks.splice toRemove, 1
                                         Preferences.set "banks", $scope.preferences.banks
+                                        $scope.calculateFeesForResults()
 
                 $scope.initializeMap = () ->
                         if google? and google.maps?

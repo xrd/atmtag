@@ -2,7 +2,8 @@ mod = angular.module "atmtag", [ 'ngCookies', 'ngResource', 'ui' ]
 @mod = mod
 
 mod.factory 'Bank', [ '$resource', ($resource) ->
-        $resource '/banks/:id/:action', {}, {}
+        $resource '/banks/:id/:action', {},
+                fee: { method: 'POST', params: { action: "fee" }, isArray: false }
         ]
 
 mod.factory 'Preferences', [ (store) ->

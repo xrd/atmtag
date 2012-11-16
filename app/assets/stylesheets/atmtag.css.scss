@@ -8,6 +8,14 @@
 /* min-height: 250px; */
 }
 
+.small {
+padding: 0.3em;
+}
+
+.cost {
+font-size: 0.8em;
+}
+
 .wrapper {
 padding: 2em;
 }
@@ -25,6 +33,15 @@ $bank: #ddd;
 .evenBank {
 
 background-color: lighten( $bank, 20% );
+}
+
+.order, .search, .myatms {
+width: 100%;
+padding: 0.5em;
+}
+
+.order-btns, .search-btns {
+text-align: right;
 }
 
 .icon {

@@ -25,26 +25,39 @@
 
   .alert{ 'ng-show' => 'message' } {{ message }}
 
+  .search{ 'ng-show' => 'attempted' }
+    .expand{ 'ng-hide' => 'results' } 
+      No results found. Expand your search? 
+      %a{ 'ng-click' => 'changeRadius(1000)' } to within {{convert(1)|number:2}} {{metric&&'km'||'mi'}}.
+      %a{ 'ng-click' => 'changeRadius(5000)' } to within {{convert(5)|number:2}} {{metric&&'km'||'mi'}}.
+      %a{ 'ng-click' => 'changeRadius(10000)' } to within {{convert(10)|number:2}} {{metric&&'km'||'mi'}}.
+
+    Search:
+    .btn.btn-mini{ 'ng-click' => 'changeRadius()' } within {{radius}} meters
+    Distances in
+    .btn.btn-mini{ 'ng-click' => 'metric = !metric' } {{metric&&'metric'||'imperial'}}
+
   #results{ 'ng-show' => 'results' }
     .order
       Order by: 
-      %span.btn-group
+      %span.btn-group.order-btns
         .btn.btn-mini{ 'ng-click' => 'order = "distance"' } Distance
         .btn.btn-mini{ 'ng-click' => 'order = "fees.amount"' } Cost
-    .search
-      Search:
-      %span.btn-group
-        .btn.btn-mini{ 'ng-click' => 'changeRadius()' } within {{radius}} meters
-        .btn.btn-mini{ 'ng-click' => 'metric = !metric' } {{metric&&'metric'||'imperial'}}
     #map_canvas
 
-    .results{ 'ng-repeat' => 'result in results | orderBy:order', 'ng-class-even' => '"evenBank"', 'ng-class-odd' => '"oddBank"' }
-      %h4 
-        {{result.name}}
-        %img{ "ng-src" => '{{result.icon}}' }
-      {{result.vicinity}}
-      .distance {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
-      .alert Your cost: {{result.fees.amount|currency}}
-      .extras
-        %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}
+    .results{ 'ng-repeat' => 'result in results | orderBy:order' }
+      %div{ 'ng-class-even' => '"evenBank"', 'ng-class-odd' => '"oddBank"' }
+        %h4 
+          {{result.name}}
+          %img{ "ng-src" => '{{result.icon}}' }
+        {{result.vicinity}}
+        .distance {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
+        .alert.alert-info.cost
+          Your cost: {{result.fees.amount|currency}}
+          %span{ 'ng-hide' => 'result.vbc' }
+            %span.badge.badge-important 
+              Estimated
+            %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)' } Help out.
+        .extras
+          %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}
 
