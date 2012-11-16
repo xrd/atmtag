@@ -26,10 +26,16 @@
   .alert{ 'ng-show' => 'message' } {{ message }}
 
   #results{ 'ng-show' => 'results' }
-    Order by: 
-    %span.btn-group
-      .btn{ 'ng-click' => 'order = "distance"' } Distance
-      .btn{ 'ng-click' => 'order = "fees.amount"' } Cost
+    .order
+      Order by: 
+      %span.btn-group
+        .btn.btn-mini{ 'ng-click' => 'order = "distance"' } Distance
+        .btn.btn-mini{ 'ng-click' => 'order = "fees.amount"' } Cost
+    .search
+      Search:
+      %span.btn-group
+        .btn.btn-mini{ 'ng-click' => 'changeRadius()' } within {{radius}} meters
+        .btn.btn-mini{ 'ng-click' => 'metric = !metric' } {{metric&&'metric'||'imperial'}}
     #map_canvas
 
     .results{ 'ng-repeat' => 'result in results | orderBy:order', 'ng-class-even' => '"evenBank"', 'ng-class-odd' => '"oddBank"' }
@@ -37,7 +43,7 @@
         {{result.name}}
         %img{ "ng-src" => '{{result.icon}}' }
       {{result.vicinity}}
-      .distance {{result.distance|number:2 }} km. away
+      .distance {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
       .alert Your cost: {{result.fees.amount|currency}}
       .extras
         %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}

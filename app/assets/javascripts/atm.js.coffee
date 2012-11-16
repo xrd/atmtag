@@ -2,10 +2,23 @@ class AtmCtrl
         constructor: ( $scope, Bank, Preferences, $cookieStore, $location, $anchorScroll ) ->
                 console.log "Loaded controller"
 
+                $scope.radius = 500
+                $scope.metric = false
+
                 $scope.$watch 'preferences.contribute', (newVal, oldVal) ->
                         if newVal != oldVal
                                 console.log "channging contribution"
                                 Preferences.set "contribute", newVal
+
+                $scope.changeRadius = () ->
+                        if radius = prompt "Enter the search radius (in meters)"
+                                $scope.radius = radius
+
+                $scope.convert = (distance) ->
+                        if $scope.metric
+                                distance
+                        else
+                                distance*0.6
 
                 $scope.hideBanksMessage = () ->
                         Preferences.set 'hideBanksMessage', true
@@ -25,7 +38,7 @@ class AtmCtrl
                                         service = new google.maps.places.PlacesService($scope.map);
                                         request = {}
                                         request.location = new google.maps.LatLng( position.coords.latitude, position.coords.longitude )
-                                        request.radius = 500
+                                        request.radius = $scope.radius
                                         request.types = [ 'atm' ]
                                         service.nearbySearch request, (results, status) ->
                                                 if status == google.maps.places.PlacesServiceStatus.OK
