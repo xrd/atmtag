@@ -11,6 +11,8 @@ class AtmCtrl
                                 console.log "channging contribution"
                                 Preferences.set "contribute", newVal
 
+
+
                 $scope.changeRadius = (count) ->
                         unless count
                                 if radius = prompt "Enter the search radius (in #{if $scope.metric then 'km' else 'mi'})"
@@ -172,7 +174,12 @@ class AtmCtrl
                         # recalculate fees
                         $scope.calculateFeesForResults()
 
+                $scope.verifyUser = () ->
+                        console.log "Inside user check"
+
                 $scope.initialize = () ->
+                        $scope.verifyUser()
+
                         $scope.loadBanks()
                         $scope.loadPreferences()
                         $scope.initializeMap()

@@ -1,4 +1,5 @@
 Atmtag::Application.routes.draw do
+  match 'users/create_from_token' => 'users#create_from_token'
   devise_for :users
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
   resources :banks

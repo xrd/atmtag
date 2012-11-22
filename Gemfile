@@ -13,7 +13,10 @@ end
 
 group :test, :development do
   gem "rspec-rails", "~> 2.0"
+  gem 'guard'
   gem 'guard-coffeescript'
+  gem 'guard-livereload'
+  gem "guard-rspec" 
   gem 'rb-fsevent', '~> 0.9.1'
 end
 

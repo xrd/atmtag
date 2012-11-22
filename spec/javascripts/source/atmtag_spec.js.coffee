@@ -1,4 +1,5 @@
 describe "AtmCtrl", () ->
+
         ctrl = undefined
         scope = undefined
         httpBackend = undefined
@@ -27,7 +28,7 @@ describe "AtmCtrl", () ->
             httpBackend.verifyNoOutstandingExpectation()
             httpBackend.verifyNoOutstandingRequest()
 
-        xdescribe "#banks", () ->
+        describe "#banks", () ->
                 it "should load banks", () ->
                         expect( scope.banks ).toEqual undefined
                         scope.initialize()
@@ -35,7 +36,8 @@ describe "AtmCtrl", () ->
                         expect( scope.banks.all[0].name ).toEqual "Chris Bank"
                 undefined
 
-        xdescribe "#costs", () ->
+
+        describe "#costs", () ->
                 it "should layer cost estimations based on selected banks", ->
                         scope.initialize()
                         httpBackend.flush()
@@ -43,7 +45,7 @@ describe "AtmCtrl", () ->
                         console.log "Hey, layering costs"
 
         describe "#match", () ->
-                
+
                 it "should match two banks with the same name", ->
                         expect( scope.match( "Chase", "Chase" ) ).toBeTruthy()
 
@@ -61,10 +63,11 @@ describe "AtmCtrl", () ->
                 it "should not match partial names with stuff in the middle", ->
                         expect( scope.match( "Chase XXX Bank", "Chase Bank" ) ).toBeFalsy()
 
+
                 it "should match regardless of case", ->
                         expect( scope.match( "CHaSe", "ChASE BAnK" ) ).toBeTruthy()
 
-                        
+
         xdescribe "#preferences", () ->
                 # WTF, this is failing
                 xit "should store and nuke settings", () ->
@@ -75,7 +78,7 @@ describe "AtmCtrl", () ->
                                         console.log "Key: #{k}"
                                         all.push k
                                 expect( all.length ).toEqual 0
-                                        
+
                         lc.get "foo", (response) ->
                         expect( response ).toEqual undefined
                         console.log "Validated empty foo"
@@ -85,7 +88,7 @@ describe "AtmCtrl", () ->
                                 console.log "Retreived foo now bar"
                                 expect( response.value ).toEqual "bar"
                                 console.log "All sanity checks for store pass"
-                                        
+
                 it "should start with preferences unset after initialization", () ->
                         expect( scope.preferences ).toEqual undefined
                         scope.initialize()
@@ -95,7 +98,7 @@ describe "AtmCtrl", () ->
                 it "should start with preferences", () ->
                         spyOn( scope, 'loadPreferences' )
                         expect( scope.preferences ).toEqual undefined
-                        
+
                 it "should start with preferences unset after initialization", () ->
                         console.log "Checking preferences prior to init"
                         spyOn( scope, 'loadPreferences' )
@@ -104,7 +107,7 @@ describe "AtmCtrl", () ->
                         scope.initialize()
                         httpBackend.flush()
                         expect( scope.loadPreferences ).toHaveBeenCalled()
-                        
+
                 it "should start with preferences retrieved properly after initialization", () ->
                         lc.save { key: "preferences.contribute", value: "no" }
                         lc.get "preferences.contribute", (value) ->
@@ -113,7 +116,7 @@ describe "AtmCtrl", () ->
                         scope.initialize()
                         httpBackend.flush()
                         expect( scope.preferences.contribute ).toEqual "no"
-                        
+
                 it "should start with contributor preferences set to 'yes' the first time after initialization", () ->
                         expect( scope.preferences ).toEqual undefined
                         scope.initialize()
@@ -128,7 +131,7 @@ describe "AtmCtrl", () ->
                                                 lc.get k, (value) ->
                                                         console.log "*** Used key: #{k} / #{value.value}"
 
-                        
-                                        
+
+
                 undefined
         undefined

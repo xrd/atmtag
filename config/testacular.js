@@ -1,9 +1,9 @@
-// Testacular configuration
-// Generated on Wed Oct 31 2012 12:58:05 GMT-0400 (EDT)
-
+// Sample Testacular configuration file, that contain pretty much all the available options
+// It's used for running client tests on Travis (http://travis-ci.org/#!/vojtajina/testacular)
+// Most of the options can be overriden by cli arguments (see testacular --help)
 
 // base path, that will be used to resolve files and exclude
-basePath = '../spec/javascripts';
+basePath = '../spec/javascripts'
 
 // list of files / patterns to load in the browser
 files = [
@@ -16,52 +16,38 @@ files = [
 ];
 
 // list of files to exclude
-exclude = [
-  "compiled/bootstrap.js" 
-];
+exclude = [];
 
-
-// test results reporter to use
-// possible values: 'dots', 'progress', 'junit'
-reporters = ['progress'];
-
+// use dots reporter, as travis terminal does not support escaping sequences
+// possible values: 'dots' || 'progress'
+reporter = 'dots';
 
 // web server port
-port = 8085;
-
+port = 8080;
 
 // cli runner port
 runnerPort = 9100;
 
-
 // enable / disable colors in the output (reporters and logs)
-colors = true;
-
+colors: true;
 
 // level of logging
 // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
 logLevel = LOG_INFO;
 
-
 // enable / disable watching file and executing tests whenever any file changes
 autoWatch = true;
 
+// polling interval in ms (ignored on OS that support inotify)
+autoWatchInterval: 0;
 
 // Start these browsers, currently available:
 // - Chrome
 // - ChromeCanary
 // - Firefox
 // - Opera
-// - Safari (only Mac)
-// - PhantomJS
-// - IE (only Windows)
-browsers = []; // ['Chrome'];
+// - Safari
+browsers = [];
 
-
-// If browser does not capture in given timeout [ms], kill it
-captureTimeout = 5000;
-
-
-// Continuous Integration mode
-// if true, it capture browsers, run tests and exit
+// Auto run tests on start (when browsers are captured) and exit
 singleRun = false;

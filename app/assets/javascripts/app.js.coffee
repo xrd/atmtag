@@ -6,6 +6,11 @@ mod.factory 'Bank', [ '$resource', ($resource) ->
                 fee: { method: 'POST', params: { action: "fee" }, isArray: false }
         ]
 
+mod.factory 'User', [ '$resource', ($resource) ->
+        $resource '/users/:id/:action', {},
+                create_from_token: { method: 'POST', params: { action: "create_from_token" }, isArray: false }
+        ]
+
 mod.factory 'Preferences', [ (store) ->
         console.log "Creating store service (lawnchair)"
         store = {}

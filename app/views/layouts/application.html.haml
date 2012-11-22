@@ -10,8 +10,10 @@
       %script{:src => "https://maps.googleapis.com/maps/api/js?libraries=places&key=AIzaSyCgEDzFPdOFepz59hBfhcTRSopF4khz3Ns&sensor=true", :type => "text/javascript"}
     = javascript_include_tag "application"
     = csrf_meta_tags
-  %body{"ng-app" => "atmtag", "ng-controller" => "AtmCtrl", "ng-init" => "initialize()", "ng-show" => "preferences"}
-    .container-fluid
+  %body{"ng-app" => "atmtag", "ng-controller" => "LoginCtrl" }
+    {{ user_token }}
+    {{ status }}
+    .container-fluid{ "ng-controller" => "AtmCtrl", "ng-init" => "initialize()", "ng-show" => "preferences"}
       .row
         .span4.hidden-phone
           %h1 Atm Tag: save money and time. Find the closest and cheapest ATMs.
