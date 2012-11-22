@@ -13,8 +13,9 @@ class AtmCtrl
 
                 $scope.changeRadius = (count) ->
                         unless count
-                                if radius = prompt "Enter the search radius (in meters)"
-                                        $scope.radius = radius
+                                if radius = prompt "Enter the search radius (in #{if $scope.metric then 'km' else 'mi'})"
+                                        $scope.radius = radius * 1000
+                                        $scope.radius *= 0.6 unless $scope.metric
                                         $scope.search()
                         else
                                 $scope.radius = count
