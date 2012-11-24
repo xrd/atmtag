@@ -71,8 +71,9 @@ class AtmCtrl
                         for result in $scope.results
                                 lat1 = current.latitude
                                 lon1 = current.longitude
-                                lat2 = result.geometry.location.Ya
-                                lon2 = result.geometry.location.Za
+                                lat2 = result.geometry.location.lat()
+                                lon2 = result.geometry.location.lng()
+                                console.log "Lat/lng: #{lat1}/#{lon1} vs. #{lat2}/#{lon2}"
                                 R = 6371; # km
                                 dLat = toRad(lat2-lat1)
                                 dLon = toRad(lon2-lon1)
@@ -83,6 +84,7 @@ class AtmCtrl
                                         Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2)
                                 c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
                                 d = R * c
+                                console.log "Distance: #{d}"
                                 result.distance = d
 
                 $scope.help = (result) ->
