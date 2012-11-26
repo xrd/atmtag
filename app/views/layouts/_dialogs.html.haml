@@ -10,6 +10,12 @@
     %label Atm Tag stores your submission with an anonymous user token. You can reset this if you want to disassociate any information submissions (ATM fees you have tagged and banks added) you have made.
     .btn.btn-block{ 'ng-click' => 'resetUserToken()' } Reset user token
 
+.fade{ 'ui-modal' => true, 'ng-model' => 'maps.display' }
+  .wrapper
+    .map
+      #map_canvas
+    Hey, wassup
+
 #banks.fade{ "ui-modal" => true, "ng-model" => "banks.chooser" }
   .wrapper.banksChooser
     .btn.btn-inverse.pull-right{ 'ng-click' => 'banks.chooser = false' } x

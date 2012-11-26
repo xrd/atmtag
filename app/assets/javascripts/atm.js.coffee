@@ -1,7 +1,7 @@
 class AtmCtrl
         constructor: ( $scope, Bank, Preferences, $cookieStore, $location, $anchorScroll ) ->
                 console.log "Loaded controller"
-
+                $scope.maps = {}
                 $scope.attempted = false
                 $scope.radius = 500
                 $scope.metric = false
@@ -46,6 +46,7 @@ class AtmCtrl
                                 if google? and google.maps?
                                         service = new google.maps.places.PlacesService($scope.map);
                                         request = {}
+                                        $scope.current = lat: position.coords.latitude, lng: position.coords.longitude
                                         request.location = new google.maps.LatLng( position.coords.latitude, position.coords.longitude )
                                         request.radius = $scope.radius
                                         request.types = [ 'atm' ]
@@ -86,6 +87,9 @@ class AtmCtrl
                                 d = R * c
                                 console.log "Distance: #{d}"
                                 result.distance = d
+
+                $scope.iob = (expanded) ->
+                        if expanded then "expanded" else "tight"
 
                 $scope.help = (result) ->
                         if fee = prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
@@ -196,13 +200,36 @@ class AtmCtrl
                                         Preferences.set "banks", $scope.preferences.banks
                                         $scope.calculateFeesForResults()
 
-                $scope.initializeMap = () ->
+                $scope.focusOnMap = (item) ->
                         if google? and google.maps?
+                                center = new google.maps.LatLng( item.geometry.location.lat(), item.geometry.location.lng() )
+                                current = new google.maps.LatLng( $scope.current.lat, $scope.current.lng )
                                 mapOptions =
-                                        center: new google.maps.LatLng(-34.397, 150.644),
-                                        zoom: 8,
+                                        center: center
+                                        zoom: 13,
                                         mapTypeId: google.maps.MapTypeId.ROADMAP
                                 $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+                                cur = new google.maps.Marker
+                                          position: current
+                                          map: $scope.map,
+                                          icon: '/assets/yellow_MarkerA.png'
+
+                                atm = new google.maps.Marker
+                                          position: center,
+                                          map: $scope.map,
+                                          icon: '/assets/green_MarkerA.png'
+
+                                $scope.maps.display = true
+
+                $scope.initializeMap = () ->
+                        if google? and google.maps?
+                                center = new google.maps.LatLng( 50, 50 )
+                                mapOptions =
+                                        center: center
+                                        zoom: 13,
+                                        mapTypeId: google.maps.MapTypeId.ROADMAP
+                                $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+                        console.log "Created map"
 
 AtmCtrl.$inject = [ '$scope', 'Bank', 'Preferences', '$cookieStore', '$location', '$anchorScroll' ]
 @AtmCtrl = AtmCtrl

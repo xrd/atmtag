@@ -9,14 +9,10 @@
       .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
       %small Choosing your bank allows us to calculate the least expensive ATM for you.
       .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
-      %small Search for the most closest, cheapeast ATM
-      .btn.btn-large.btn-block{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Set preferences
-      %small Anonymity options, etc.
+      %small Search for the closest, cheapeast ATM
     .small{ 'ng-show' => 'results' }
-      .btn-group
-        .btn.btn-large{ 'ng-click' => 'banks.chooser = !banks.chooser' } Banks
-        .btn.btn-large{ 'ng-click' => 'search()' } Search
-        .btn.btn-large{ 'ng-click' => 'preferences.chooser = !preferences.chooser' } Preferences
+      .btn.btn-large{ 'ng-click' => 'banks.chooser = !banks.chooser' } Banks
+      .btn.btn-large{ 'ng-click' => 'search()' } Search
     .myatms{ 'ng-show' => 'preferences.banks' }
       My ATM cards:
       %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
@@ -29,16 +25,16 @@
     .expand{ 'ng-hide' => 'results' } 
       No results found. 
       Expand by:
-      %span.btn-group
-        %a.btn{ 'ng-click' => 'changeRadius(1000)' } {{convert(1)}}
-        %a.btn{ 'ng-click' => 'changeRadius(5000)' } {{convert(5)}}
-        %a.btn{ 'ng-click' => 'changeRadius(10000)' } {{convert(10)}}
+      %select{ 'ng-change' => 'changeRadius(radius)', 'ng-model' => 'radius' }
+        %option{ value: '1000' } 1
+        %option{ value: '5000' } 5
+        %option{ value: '10000' } 10
       {{metric&&'km'||'mi'}}.
     Searching within
     .btn.btn-mini{ 'ng-click' => 'changeRadius()' } {{convert(radius/1000)}}
     {{metric&&'km'||'mi'}}.
-    Distances in
-    .btn.btn-mini{ 'ng-click' => 'metric = !metric' } {{metric&&'metric'||'imperial'}}
+    Switch to
+    .btn.btn-mini{ 'ng-click' => 'metric = !metric' } {{metric&&'imperial'||'metric'}}
 
   #results{ 'ng-show' => 'results' }
     .order
@@ -46,21 +42,24 @@
       %span.btn-group.order-btns
         .btn.btn-mini{ 'ng-click' => 'order = "distance"' } Distance
         .btn.btn-mini{ 'ng-click' => 'order = "fees.amount"' } Cost
-    #map_canvas
 
     .results{ 'ng-repeat' => 'result in results | orderBy:order' }
-      %div{ 'ng-class' => '$index%2==0&&"evenBank"||"oddBank"' }
-        %h4 
-          {{result.name}}
-          %img{ "ng-src" => '{{result.icon}}' }
-        {{result.vicinity}}
-        .distance {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
-        .alert.alert-info.cost
-          Your cost: {{result.fees.amount|currency}}
-          %span{ 'ng-hide' => 'result.vbc' }
-            %span.badge.badge-important 
+      %div.result{ 'ng-class' => '$index%2==0&&"evenBank"||"oddBank"' }
+        .name{ 'ng-click' => 'result.expanded = !result.expanded' }
+          %img.pull-left{ "ng-src" => '{{result.icon}}', 'ng-show' => 'result.expanded' }
+          %h3 {{result.name}}
+        .address{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }{{result.vicinity}}
+        .distance{ 'ng-class' => 'iob(result.expanded)' } {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
+        .alert.alert-info.cost{ 'ng-class' => 'iob(result.expanded)' }
+          %span{ 'ng-show' => 'result.expanded' } Your cost: 
+          {{result.fees.amount|currency}}
+          %span{ 'ng-show' => 'result.expanded' }
+            %span.badge.badge-important{ 'ng-show' => '3 < result.vbc' }
               Estimated
-            %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)' } Help out.
-        .extras
+            %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)', 'ng-show' => '3 < result.vbc' } Help out.
+        .btn{ 'ng-click' => 'focusOnMap(result)' }
+          .icon-map-marker
+          %span{ 'ng-show' => 'result.expanded' } Show on map
+        .extras{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }
           %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}
 
