@@ -13,8 +13,9 @@ mod.factory 'User', [ '$resource', ($resource) ->
 
 
 mod.config [ '$httpProvider', ($httpProvider) ->
-        authToken = $('meta[name="csrf-token"]').attr('content')
-        $httpProvider.defaults.headers.common[ 'X-CSRF-TOKEN' ] = authToken
+        if $?
+                authToken = $('meta[name="csrf-token"]').attr('content')
+                $httpProvider.defaults.headers.common[ 'X-CSRF-TOKEN' ] = authToken
         ]
 
 mod.factory 'Preferences', [ (store) ->

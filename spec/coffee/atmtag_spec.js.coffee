@@ -4,21 +4,23 @@ describe "AtmCtrl", () ->
         scope = undefined
         httpBackend = undefined
         lc = undefined
+        mock = undefined
 
         beforeEach( module( 'atmtag' ) )
+        mockPrompt = jasmine.createSpy().andReturn( 1.5 )
+        window.prompt = mockPrompt
 
-        beforeEach ->
-                console.log "Creating new lawnchair"
-                Lawnchair { name: "atmtag" }, (store) ->
-                        store.keys (keys) ->
-                                for k in keys
-                                        console.log "Keys: #{k}"
-                        console.log "Created new lawnchair"
-                        store.nuke()
-                        lc = store
-                        console.log "Nuked lawnchair"
+        if true
+                beforeEach ->
+                        Lawnchair { name: "atmtag" }, (store) ->
+                                store.keys (keys) ->
+                                        for k in keys
+                                                console.log "Keys: #{k}"
+                                store.nuke()
+                                lc = store
 
         beforeEach( inject ($controller, $rootScope, $httpBackend ) ->
+
                 httpBackend = $httpBackend
                 $httpBackend.whenGET( /banks/ ).respond( banks )
                 scope = $rootScope.$new();
@@ -34,15 +36,18 @@ describe "AtmCtrl", () ->
                         scope.initialize()
                         httpBackend.flush()
                         expect( scope.banks.all[0].name ).toEqual "Chris Bank"
-                undefined
-
 
         describe "#costs", () ->
                 it "should layer cost estimations based on selected banks", ->
                         scope.initialize()
                         httpBackend.flush()
                         expect( scope.banks.all[0].cost ).toEqual undefined
-                        console.log "Hey, layering costs"
+                        expect( scope.preferences.banks.length ).toEqual 0
+                        scope.bank = scope.banks.all[1]
+                        scope.addBank()
+                        expect( scope.preferences.banks.length ).toEqual 1
+                        scope.setBankFee( 4 )
+                        expect(mockPrompt).toHaveBeenCalled()
 
         describe "#match", () ->
 

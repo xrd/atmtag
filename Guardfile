@@ -1,9 +1,9 @@
-guard 'coffeescript', :output => 'spec/compiled/javascripts' do
+guard 'coffeescript', :output => 'spec/javascripts/compiled' do
   watch(%r{^app/assets/javascripts/(.*)\.coffee})
 end
 
-guard 'coffeescript', :output => 'spec/compiled/javascripts' do
-  watch(%r{^spec/javascripts/(.*)\.coffee})
+guard 'coffeescript', :output => 'spec/javascripts/tests' do
+  watch(%r{^spec/coffee/(.*)\.coffee})
 end
 
 guard 'livereload' do

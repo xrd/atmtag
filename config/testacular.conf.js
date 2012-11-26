@@ -12,7 +12,8 @@ files = [
   "libraries/angular.js",
   "libraries/*.js",
   "fixtures/*.js",
-  "compiled/*.js"
+  "compiled/*.js",
+  "tests/*.js"
 ];
 
 // list of files to exclude

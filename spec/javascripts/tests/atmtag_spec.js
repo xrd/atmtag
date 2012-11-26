@@ -1,32 +1,34 @@
 (function() {
 
   describe("AtmCtrl", function() {
-    var ctrl, httpBackend, lc, scope;
+    var ctrl, httpBackend, lc, mock, mockPrompt, scope;
     ctrl = void 0;
     scope = void 0;
     httpBackend = void 0;
     lc = void 0;
+    mock = void 0;
     beforeEach(module('atmtag'));
-    beforeEach(function() {
-      console.log("Creating new lawnchair");
-      return Lawnchair({
-        name: "atmtag"
-      }, function(store) {
-        store.keys(function(keys) {
-          var k, _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = keys.length; _i < _len; _i++) {
-            k = keys[_i];
-            _results.push(console.log("Keys: " + k));
-          }
-          return _results;
+    mockPrompt = jasmine.createSpy().andReturn(1.5);
+    window.prompt = mockPrompt;
+    if (true) {
+      beforeEach(function() {
+        return Lawnchair({
+          name: "atmtag"
+        }, function(store) {
+          store.keys(function(keys) {
+            var k, _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = keys.length; _i < _len; _i++) {
+              k = keys[_i];
+              _results.push(console.log("Keys: " + k));
+            }
+            return _results;
+          });
+          store.nuke();
+          return lc = store;
         });
-        console.log("Created new lawnchair");
-        store.nuke();
-        lc = store;
-        return console.log("Nuked lawnchair");
       });
-    });
+    }
     beforeEach(inject(function($controller, $rootScope, $httpBackend) {
       httpBackend = $httpBackend;
       $httpBackend.whenGET(/banks/).respond(banks);
@@ -39,21 +41,25 @@
       httpBackend.verifyNoOutstandingExpectation();
       return httpBackend.verifyNoOutstandingRequest();
     });
-    xdescribe("#banks", function() {
-      it("should load banks", function() {
+    describe("#banks", function() {
+      return it("should load banks", function() {
         expect(scope.banks).toEqual(void 0);
         scope.initialize();
         httpBackend.flush();
         return expect(scope.banks.all[0].name).toEqual("Chris Bank");
       });
-      return void 0;
     });
-    xdescribe("#costs", function() {
+    describe("#costs", function() {
       return it("should layer cost estimations based on selected banks", function() {
         scope.initialize();
         httpBackend.flush();
         expect(scope.banks.all[0].cost).toEqual(void 0);
-        return console.log("Hey, layering costs");
+        expect(scope.preferences.banks.length).toEqual(0);
+        scope.bank = scope.banks.all[1];
+        scope.addBank();
+        expect(scope.preferences.banks.length).toEqual(1);
+        scope.setBankFee(4);
+        return expect(mockPrompt).toHaveBeenCalled();
       });
     });
     describe("#match", function() {

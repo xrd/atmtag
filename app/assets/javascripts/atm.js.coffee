@@ -11,11 +11,9 @@ class AtmCtrl
                                 console.log "channging contribution"
                                 Preferences.set "contribute", newVal
 
-
-
                 $scope.changeRadius = (count) ->
                         unless count
-                                if radius = prompt "Enter the search radius (in #{if $scope.metric then 'km' else 'mi'})"
+                                if radius = window.prompt "Enter the search radius (in #{if $scope.metric then 'km' else 'mi'})"
                                         $scope.radius = radius * 1000
                                         $scope.radius *= 0.6 unless $scope.metric
                                         $scope.search()
@@ -93,7 +91,7 @@ class AtmCtrl
                         if expanded then "expanded" else "tight"
 
                 $scope.help = (result) ->
-                        if fee = prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
+                        if fee = window.prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
                                 lat = result.geometry.location.lat
                                 lng = result.geometry.location.lng
                                 name = result.name
@@ -107,7 +105,7 @@ class AtmCtrl
 
 
                 $scope.setBankFee = (bank) ->
-                        if fee = prompt "What fee do you pay at this bank?"
+                        if fee = window.prompt "What fee do you pay at this bank?"
                                 bank.myFee = fee
 
                 $scope.calculateFeesForResults = () ->
