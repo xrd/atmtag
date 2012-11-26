@@ -54,10 +54,10 @@
           %span{ 'ng-show' => 'result.expanded' } Your cost: 
           {{result.fees.amount|currency}}
           %span{ 'ng-show' => 'result.expanded' }
-            %span.badge.badge-important{ 'ng-show' => '3 < result.vbc' }
+            %span.badge.badge-important
               Estimated
-            %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)', 'ng-show' => '3 < result.vbc' } Help out.
-        .btn{ 'ng-click' => 'focusOnMap(result)' }
+            %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)' } Help out.
+        .btn.hide{ 'ng-click' => 'focusOnMap(result)' }
           .icon-map-marker
           %span{ 'ng-show' => 'result.expanded' } Show on map
         .extras{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }
