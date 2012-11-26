@@ -111,7 +111,10 @@ class AtmCtrl
                 $scope.calculateFeesForResults = () ->
                         # Calculate cost
                         if $scope.banks.all and $scope.results
+                                console.log "Have banks and results loaded"
+
                                 for bank in $scope.banks.all
+                                        console.log "Checking #{bank.name} in all"
                                         for gBank in $scope.results
                                                 fee = calculateCost( gBank, bank )
                                                 # vbc == validated by count
@@ -185,9 +188,9 @@ class AtmCtrl
                         Bank.query (response) ->
                                 $scope.banks.all = response
 
-                $scope.addBank = () ->
+                $scope.addBank = (bank) ->
                         $scope.preferences.banks ||= []
-                        $scope.preferences.banks.push $scope.bank
+                        $scope.preferences.banks.push bank
                         Preferences.set "banks", $scope.preferences.banks
                         $scope.bank = undefined
                         # recalculate fees

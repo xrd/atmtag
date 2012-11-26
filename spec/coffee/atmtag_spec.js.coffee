@@ -3,28 +3,28 @@ describe "AtmCtrl", () ->
         ctrl = undefined
         scope = undefined
         httpBackend = undefined
-        lc = undefined
         mock = undefined
+        prefs = undefined
 
         beforeEach( module( 'atmtag' ) )
         mockPrompt = jasmine.createSpy().andReturn( 1.5 )
         window.prompt = mockPrompt
 
-        if true
-                beforeEach ->
-                        Lawnchair { name: "atmtag" }, (store) ->
-                                store.keys (keys) ->
-                                        for k in keys
-                                                console.log "Keys: #{k}"
-                                store.nuke()
-                                lc = store
+        store = {}
+        setStore = (key, item) ->
+                store[key] = item
+        getStore = (key) ->
+                store[key]
+        prefs = { get: getStore , set: getStore, all: jasmine.createSpy() }
 
-        beforeEach( inject ($controller, $rootScope, $httpBackend ) ->
-
+        beforeEach inject ($controller, $rootScope, $httpBackend ) ->
                 httpBackend = $httpBackend
                 $httpBackend.whenGET( /banks/ ).respond( banks )
                 scope = $rootScope.$new();
-                ctrl = $controller( AtmCtrl, $scope: scope ) )
+                ctrl = $controller( AtmCtrl, { $scope: scope, Preferences: prefs } )
+                spyOn( scope, 'search' ).andCallFake () ->
+                        console.log "INSIDE SEARCH!"
+                        scope.results = results
 
         afterEach ->
             httpBackend.verifyNoOutstandingExpectation()
@@ -37,17 +37,33 @@ describe "AtmCtrl", () ->
                         httpBackend.flush()
                         expect( scope.banks.all[0].name ).toEqual "Chris Bank"
 
-        describe "#costs", () ->
-                it "should layer cost estimations based on selected banks", ->
+        describe "#preferences", () ->
+                beforeEach () ->
                         scope.initialize()
                         httpBackend.flush()
+
+                it "should store banks as preferences", () ->
                         expect( scope.banks.all[0].cost ).toEqual undefined
-                        expect( scope.preferences.banks.length ).toEqual 0
-                        scope.bank = scope.banks.all[1]
-                        scope.addBank()
-                        expect( scope.preferences.banks.length ).toEqual 1
-                        scope.setBankFee( 4 )
+                        expect( scope.preferences.banks ).toEqual undefined
+                        scope.addBank(scope.banks.all[1])
+                        expect( scope.preferences.banks[0] ).toEqual scope.banks.all[1]
+
+        describe "#costs", () ->
+                beforeEach () ->
+                        scope.initialize()
+                        httpBackend.flush()
+
+                it "should layer cost estimations based on selected banks", ->
+                        scope.addBank(scope.banks.all[0])
+                        scope.setBankFee( scope.preferences.banks[0] )
                         expect(mockPrompt).toHaveBeenCalled()
+                        expect( scope.preferences.banks[0].myFee ).toEqual 1.5
+
+                it "should have a cost of zero if we have the bank in our banks", ->
+                        scope.search()
+                        expect( scope.results[0].fees ).toEqual undefined
+                        scope.addBank(scope.banks.all[0])
+                        expect( scope.results[0].fees.amount ).toEqual 0
 
         describe "#match", () ->
 

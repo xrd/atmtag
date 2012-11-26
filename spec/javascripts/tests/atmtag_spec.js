@@ -1,40 +1,38 @@
 (function() {
 
   describe("AtmCtrl", function() {
-    var ctrl, httpBackend, lc, mock, mockPrompt, scope;
+    var ctrl, getStore, httpBackend, mock, mockPrompt, prefs, scope, setStore, store;
     ctrl = void 0;
     scope = void 0;
     httpBackend = void 0;
-    lc = void 0;
     mock = void 0;
+    prefs = void 0;
     beforeEach(module('atmtag'));
     mockPrompt = jasmine.createSpy().andReturn(1.5);
     window.prompt = mockPrompt;
-    if (true) {
-      beforeEach(function() {
-        return Lawnchair({
-          name: "atmtag"
-        }, function(store) {
-          store.keys(function(keys) {
-            var k, _i, _len, _results;
-            _results = [];
-            for (_i = 0, _len = keys.length; _i < _len; _i++) {
-              k = keys[_i];
-              _results.push(console.log("Keys: " + k));
-            }
-            return _results;
-          });
-          store.nuke();
-          return lc = store;
-        });
-      });
-    }
+    store = {};
+    setStore = function(key, item) {
+      return store[key] = item;
+    };
+    getStore = function(key) {
+      return store[key];
+    };
+    prefs = {
+      get: getStore,
+      set: getStore,
+      all: jasmine.createSpy()
+    };
     beforeEach(inject(function($controller, $rootScope, $httpBackend) {
       httpBackend = $httpBackend;
       $httpBackend.whenGET(/banks/).respond(banks);
       scope = $rootScope.$new();
-      return ctrl = $controller(AtmCtrl, {
-        $scope: scope
+      ctrl = $controller(AtmCtrl, {
+        $scope: scope,
+        Preferences: prefs
+      });
+      return spyOn(scope, 'search').andCallFake(function() {
+        console.log("INSIDE SEARCH!");
+        return scope.results = results;
       });
     }));
     afterEach(function() {
@@ -49,17 +47,34 @@
         return expect(scope.banks.all[0].name).toEqual("Chris Bank");
       });
     });
-    describe("#costs", function() {
-      return it("should layer cost estimations based on selected banks", function() {
+    describe("#preferences", function() {
+      beforeEach(function() {
         scope.initialize();
-        httpBackend.flush();
+        return httpBackend.flush();
+      });
+      return it("should store banks as preferences", function() {
         expect(scope.banks.all[0].cost).toEqual(void 0);
-        expect(scope.preferences.banks.length).toEqual(0);
-        scope.bank = scope.banks.all[1];
-        scope.addBank();
-        expect(scope.preferences.banks.length).toEqual(1);
-        scope.setBankFee(4);
-        return expect(mockPrompt).toHaveBeenCalled();
+        expect(scope.preferences.banks).toEqual(void 0);
+        scope.addBank(scope.banks.all[1]);
+        return expect(scope.preferences.banks[0]).toEqual(scope.banks.all[1]);
+      });
+    });
+    describe("#costs", function() {
+      beforeEach(function() {
+        scope.initialize();
+        return httpBackend.flush();
+      });
+      it("should layer cost estimations based on selected banks", function() {
+        scope.addBank(scope.banks.all[0]);
+        scope.setBankFee(scope.preferences.banks[0]);
+        expect(mockPrompt).toHaveBeenCalled();
+        return expect(scope.preferences.banks[0].myFee).toEqual(1.5);
+      });
+      return it("should have a cost of zero if we have the bank in our banks", function() {
+        scope.search();
+        expect(scope.results[0].fees).toEqual(void 0);
+        scope.addBank(scope.banks.all[0]);
+        return expect(scope.results[0].fees.amount).toEqual(0);
       });
     });
     describe("#match", function() {

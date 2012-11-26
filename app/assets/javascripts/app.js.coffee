@@ -21,9 +21,7 @@ mod.config [ '$httpProvider', ($httpProvider) ->
 mod.factory 'Preferences', [ (store) ->
         console.log "Creating store service (lawnchair)"
         store = {}
-        Lawnchair (lawnchair) ->
-                # lawnchair.nuke()
-                store = {}
+        Lawnchair name: 'atmtag', (lawnchair) ->
                 store.get = ( key, cb ) ->
                         console.log "Getting preference for: #{key}"
                         lawnchair.get key, (response) ->

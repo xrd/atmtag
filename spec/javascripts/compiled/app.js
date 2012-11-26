@@ -47,8 +47,9 @@
     function(store) {
       console.log("Creating store service (lawnchair)");
       store = {};
-      Lawnchair(function(lawnchair) {
-        store = {};
+      Lawnchair({
+        name: 'atmtag'
+      }, function(lawnchair) {
         store.get = function(key, cb) {
           console.log("Getting preference for: " + key);
           return lawnchair.get(key, function(response) {

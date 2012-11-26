@@ -145,10 +145,12 @@
       $scope.calculateFeesForResults = function() {
         var bank, fee, gBank, vbc, _i, _len, _ref, _results;
         if ($scope.banks.all && $scope.results) {
+          console.log("Have banks and results loaded");
           _ref = $scope.banks.all;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             bank = _ref[_i];
+            console.log("Checking " + bank.name + " in all");
             _results.push((function() {
               var _j, _len1, _ref1, _results1;
               _ref1 = $scope.results;
@@ -253,10 +255,10 @@
           return $scope.banks.all = response;
         });
       };
-      $scope.addBank = function() {
+      $scope.addBank = function(bank) {
         var _base;
         (_base = $scope.preferences).banks || (_base.banks = []);
-        $scope.preferences.banks.push($scope.bank);
+        $scope.preferences.banks.push(bank);
         Preferences.set("banks", $scope.preferences.banks);
         $scope.bank = void 0;
         return $scope.calculateFeesForResults();
