@@ -6,7 +6,7 @@
         .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
         .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
     .large{ 'ng-hide' => 'results' }
-      .btn.btn-large.btn-block{ 'ng-click' => 'banks.chooser = !banks.chooser' } Choose your banks
+      .btn.btn-large.btn-block{ 'ng-click' => 'chooseBanks()' } Choose your banks
       %small Choosing your bank allows us to calculate the least expensive ATM for you.
       .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
       %small Search for the closest, cheapeast ATM
@@ -48,7 +48,10 @@
         .name{ 'ng-click' => 'result.expanded = !result.expanded' }
           %img.pull-left{ "ng-src" => '{{result.icon}}', 'ng-show' => 'result.expanded' }
           %h3 {{result.name}}
-        .address{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }{{result.vicinity}}
+        .address{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }
+          .icon-map-marker
+          %a{ target: 'atm_map', 'ng-href' => 'https://maps.google.com/maps?q=atm&sll={{current.lat}},{{current.lng}}&hq={{result.name}}&z=16' }
+            {{result.vicinity}}
         .distance{ 'ng-class' => 'iob(result.expanded)' } {{convert(result.distance)|number:2}} {{metric&&'km'||'mi'}}. away
         .alert.alert-info.cost{ 'ng-class' => 'iob(result.expanded)' }
           %span{ 'ng-show' => 'result.expanded' } Your cost: 
@@ -63,3 +66,5 @@
         .extras{ 'ng-show' => 'result.expanded', 'ng-class' => 'iob(result.expanded)' }
           %span.extra.badge{ 'ng-repeat' => 'type in result.types' } {{ type }}
 
+.hide
+  #map_canvas

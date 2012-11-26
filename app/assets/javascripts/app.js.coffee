@@ -3,12 +3,18 @@ mod = angular.module "atmtag", [ 'ngCookies', 'ngResource', 'ui' ]
 
 mod.factory 'Bank', [ '$resource', ($resource) ->
         $resource '/banks/:id/:action', {},
-                fee: { method: 'POST', params: { action: "fee" }, isArray: false }
+                add_estimation: { method: 'POST', params: { action: "add_estimation" }, isArray: false }
         ]
 
 mod.factory 'User', [ '$resource', ($resource) ->
         $resource '/users/:id/:action', {},
                 create_from_token: { method: 'POST', params: { action: "create_from_token" }, isArray: false }
+        ]
+
+
+mod.config [ '$httpProvider', ($httpProvider) ->
+        authToken = $('meta[name="csrf-token"]').attr('content')
+        $httpProvider.defaults.headers.common[ 'X-CSRF-TOKEN' ] = authToken
         ]
 
 mod.factory 'Preferences', [ (store) ->

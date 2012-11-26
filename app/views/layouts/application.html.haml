@@ -14,13 +14,16 @@
     .debug
       {{ user_token }}
       {{ status }}
-    .container-fluid{ "ng-controller" => "AtmCtrl", "ng-init" => "initialize()", "ng-show" => "preferences"}
-      .row
-        .span4.hidden-phone
-          %h1 Atm Tag: save money and time. Find the closest and cheapest ATMs.
-        .span4
-          = render partial: 'layouts/dialogs'
-          %h2.visible-phone{ "ng-hide" => "results" } Atm Tag: save money and time. Find the closest and cheapest ATMs.
-          = yield
-        .span4.hidden-phone
-          %h3 Atm Tag works best on your mobile phone.
+
+    .atms{  "ng-controller" => "AtmCtrl", "ng-init" => "initialize()", "ng-show" => "preferences"}
+      = render partial: 'layouts/dialogs'
+      .container-fluid
+        .row
+          .span4.hidden-phone
+            %h1 Atm Tag: save money and time. Find the closest and cheapest ATMs.
+          .span4
+            %h2.visible-phone{ "ng-hide" => "results" } Atm Tag: save money and time. Find the closest and cheapest ATMs.
+            = yield
+          .span4.hidden-phone
+            %h3 Atm Tag works best on your mobile phone.
+  

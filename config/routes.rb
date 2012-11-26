@@ -2,7 +2,11 @@ Atmtag::Application.routes.draw do
   match 'users/create_from_token' => 'users#create_from_token'
   devise_for :users
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
-  resources :banks
+  resources :banks do
+    collection do
+      post :add_estimation
+    end
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

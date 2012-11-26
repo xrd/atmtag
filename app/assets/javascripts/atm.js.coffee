@@ -38,6 +38,7 @@ class AtmCtrl
                                 navigator.geolocation.getCurrentPosition( cb );
 
                 $scope.search = () ->
+                        $scope.results = undefined
                         $scope.message = "Acquiring current location"
                         $scope.getCurrentLocation (position) ->
                                 $scope.message = "Got current location, now searching local ATMs"
@@ -93,8 +94,21 @@ class AtmCtrl
 
                 $scope.help = (result) ->
                         if fee = prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
-                                Bank.fee {}, { fee: fee }, (response) ->
-                                        alert( "Thanks" )
+                                lat = result.geometry.location.lat
+                                lng = result.geometry.location.lng
+                                name = result.name
+                                Bank.add_estimation {}, { estimation: { fee: fee, lat: lat, lng: lng, name: name, uid: result.id } }, (response) ->
+                                        if "ok" == response.status
+                                                result.
+                                                console.log "Registered result"
+                                                $scope.calculateFeesForResults()
+                                        else
+                                                console.log "Error"
+
+
+                $scope.setBankFee = (bank) ->
+                        if fee = prompt "What fee do you pay at this bank?"
+                                bank.myFee = fee
 
                 $scope.calculateFeesForResults = () ->
                         # Calculate cost
@@ -109,7 +123,7 @@ class AtmCtrl
                 calculateCost = ( gBank, bank ) ->
                         # my withdrawal fee
                         mwf = $scope.preferences.mwf || 2.5
-                        af = parseFloat( bank.averageFee ) || 2.5
+                        af = bank.myFee || parseFloat( bank.averageFee ) || 2.5
                         rv = -1
                         # Lookup our banks, and assign fees
                         if $scope.preferences.banks
@@ -139,7 +153,8 @@ class AtmCtrl
                         rv
 
                 $scope.chooseBanks = () ->
-                        console.log "Hi there"
+                        $scope.banks.chooser = true
+                        $('.modal').css( left: '300px', top: '250px', width: '280px' )
 
                 loadContributorPreference = () ->
                         Preferences.get "contribute", (result) ->
