@@ -206,7 +206,7 @@ class AtmCtrl
                                 current = new google.maps.LatLng( $scope.current.lat, $scope.current.lng )
                                 mapOptions =
                                         center: center
-                                        zoom: 13,
+                                        zoom: 15,
                                         mapTypeId: google.maps.MapTypeId.ROADMAP
                                 $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
                                 cur = new google.maps.Marker
@@ -217,8 +217,8 @@ class AtmCtrl
                                 atm = new google.maps.Marker
                                           position: center,
                                           map: $scope.map,
-                                          icon: '/assets/green_MarkerA.png'
-
+                                          icon: '/assets/green_MarkerZ.png'
+                                $scope.maps.atm = item
                                 $scope.maps.display = true
 
                 $scope.initializeMap = () ->
@@ -226,7 +226,7 @@ class AtmCtrl
                                 center = new google.maps.LatLng( 50, 50 )
                                 mapOptions =
                                         center: center
-                                        zoom: 13,
+                                        zoom: 15,
                                         mapTypeId: google.maps.MapTypeId.ROADMAP
                                 $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
                         console.log "Created map"

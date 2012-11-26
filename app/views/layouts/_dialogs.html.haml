@@ -14,7 +14,12 @@
   .wrapper
     .map
       #map_canvas
-    Hey, wassup
+      .me
+        = image_tag 'yellow_MarkerA.png'
+        Me
+      .atm
+        = image_tag 'green_MarkerZ.png'
+        {{maps.atm.name}}
 
 #banks.fade{ "ui-modal" => true, "ng-model" => "banks.chooser" }
   .wrapper.banksChooser
