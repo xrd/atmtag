@@ -22,7 +22,7 @@
     %input{ type: 'radio', 'ng-model' => 'banks.display', value: 'alphabetical' } all alphabetical
 
     .alphabetical{ 'ng-show' => 'banks.display == "alphabetical"' }
-      %select{ 'ng-options' => 'b.name for b in banks.all | orderBy:"name"', 'ng-change' => 'addBank()', 'ng-model' => 'bank' }
+      %select{ 'ng-options' => 'b.name for b in banks.all | orderBy:"name"', 'ng-change' => 'addBank(bank)', 'ng-model' => 'bank' }
     .byState{ 'ng-show' => 'banks.display == "byState"' }
       %select{ 'ng-change' => 'addBank(bank)', 'ng-model' => 'bank', 'ng-options' => 'b.name group by b.state for b in banks.all | orderBy:["state","name"]' }
 

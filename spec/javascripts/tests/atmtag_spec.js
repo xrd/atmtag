@@ -31,7 +31,6 @@
         Preferences: prefs
       });
       return spyOn(scope, 'search').andCallFake(function() {
-        console.log("INSIDE SEARCH!");
         return scope.results = results;
       });
     }));
@@ -68,7 +67,8 @@
         scope.addBank(scope.banks.all[0]);
         scope.setBankFee(scope.preferences.banks[0]);
         expect(mockPrompt).toHaveBeenCalled();
-        return expect(scope.preferences.banks[0].myFee).toEqual(1.5);
+        expect(scope.preferences.banks[0].myFee).toEqual(1.5);
+        return expect(scope.results[0].fees.amount).toEqual(3.5);
       });
       return it("should have a cost of zero if we have the bank in our banks", function() {
         scope.search();

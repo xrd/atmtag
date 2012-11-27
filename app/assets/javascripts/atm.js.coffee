@@ -1,6 +1,6 @@
 class AtmCtrl
         constructor: ( $scope, Bank, Preferences, $cookieStore, $location, $anchorScroll ) ->
-                console.log "Loaded controller"
+                # console.log "Loaded controller"
                 $scope.maps = {}
                 $scope.attempted = false
                 $scope.radius = 500
@@ -8,7 +8,7 @@ class AtmCtrl
 
                 $scope.$watch 'preferences.contribute', (newVal, oldVal) ->
                         if newVal != oldVal
-                                console.log "channging contribution"
+                                # console.log "channging contribution"
                                 Preferences.set "contribute", newVal
 
                 $scope.changeRadius = (count) ->
@@ -98,23 +98,23 @@ class AtmCtrl
                                 Bank.add_estimation {}, { estimation: { fee: fee, lat: lat, lng: lng, name: name, uid: result.id } }, (response) ->
                                         if "ok" == response.status
                                                 result.
-                                                console.log "Registered result"
+                                                # console.log "Registered result"
                                                 $scope.calculateFeesForResults()
                                         else
-                                                console.log "Error"
-
+                                                # console.log "Error"
 
                 $scope.setBankFee = (bank) ->
                         if fee = window.prompt "What fee do you pay at this bank?"
                                 bank.myFee = fee
+                                console.log "Fee: #{bank.myFee}"
+                                $scope.calculateFeesForResults()
 
                 $scope.calculateFeesForResults = () ->
                         # Calculate cost
                         if $scope.banks.all and $scope.results
-                                console.log "Have banks and results loaded"
-
+                                # console.log "Have banks and results loaded"
                                 for bank in $scope.banks.all
-                                        console.log "Checking #{bank.name} in all"
+                                        # console.log "Checking #{bank.name} in all"
                                         for gBank in $scope.results
                                                 fee = calculateCost( gBank, bank )
                                                 # vbc == validated by count
@@ -124,6 +124,7 @@ class AtmCtrl
                 calculateCost = ( gBank, bank ) ->
                         # my withdrawal fee
                         mwf = $scope.preferences.mwf || 2.5
+                        console.log "Checking costs for #{bank.name}: #{bank.myFee} vs #{bank.averageFee}"
                         af = bank.myFee || parseFloat( bank.averageFee ) || 2.5
                         rv = -1
                         # Lookup our banks, and assign fees
@@ -168,16 +169,16 @@ class AtmCtrl
                                         console.log "Defined: #{$scope.preferences.contribute}"
 
                 $scope.loadPreferences = () ->
-                        console.log "Loading preferences"
+                        #console.log "Loading preferences"
                         $scope.preferences = {}
-                        console.log "Getting banks message"
+                        #console.log "Getting banks message"
                         Preferences.get "hideBanksMessage", (response) ->
-                                console.log "Retrieving preferences for banks: #{response}"
+                                #console.log "Retrieving preferences for banks: #{response}"
                                 $scope.preferences.hideBanksMessage = response
-                        console.log "Getting contributor message"
+                        #console.log "Getting contributor message"
                         loadContributorPreference()
                         Preferences.get "banks", (response) ->
-                                console.log "Retrieving preferences for all banks: #{response}"
+                                #console.log "Retrieving preferences for all banks: #{response}"
                                 $scope.preferences.banks = response
 
                         Preferences.all (response) ->
@@ -197,7 +198,7 @@ class AtmCtrl
                         $scope.calculateFeesForResults()
 
                 $scope.verifyUser = () ->
-                        console.log "Inside user check"
+                        # console.log "Inside user check"
 
                 $scope.initialize = () ->
                         $scope.verifyUser()
@@ -245,7 +246,7 @@ class AtmCtrl
                                         zoom: 15,
                                         mapTypeId: google.maps.MapTypeId.ROADMAP
                                 $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-                        console.log "Created map"
+                        # console.log "Created map"
 
 AtmCtrl.$inject = [ '$scope', 'Bank', 'Preferences', '$cookieStore', '$location', '$anchorScroll' ]
 @AtmCtrl = AtmCtrl

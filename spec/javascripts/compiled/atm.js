@@ -5,14 +5,12 @@
 
     function AtmCtrl($scope, Bank, Preferences, $cookieStore, $location, $anchorScroll) {
       var calculateCost, loadContributorPreference;
-      console.log("Loaded controller");
       $scope.maps = {};
       $scope.attempted = false;
       $scope.radius = 500;
       $scope.metric = false;
       $scope.$watch('preferences.contribute', function(newVal, oldVal) {
         if (newVal !== oldVal) {
-          console.log("channging contribution");
           return Preferences.set("contribute", newVal);
         }
       });
@@ -128,10 +126,9 @@
             }
           }, function(response) {
             if ("ok" === response.status) {
-              result.console.log("Registered result");
-              return $scope.calculateFeesForResults();
+              return result.$scope.calculateFeesForResults();
             } else {
-              return console.log("Error");
+
             }
           });
         }
@@ -139,18 +136,18 @@
       $scope.setBankFee = function(bank) {
         var fee;
         if (fee = window.prompt("What fee do you pay at this bank?")) {
-          return bank.myFee = fee;
+          bank.myFee = fee;
+          console.log("Fee: " + bank.myFee);
+          return $scope.calculateFeesForResults();
         }
       };
       $scope.calculateFeesForResults = function() {
         var bank, fee, gBank, vbc, _i, _len, _ref, _results;
         if ($scope.banks.all && $scope.results) {
-          console.log("Have banks and results loaded");
           _ref = $scope.banks.all;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             bank = _ref[_i];
-            console.log("Checking " + bank.name + " in all");
             _results.push((function() {
               var _j, _len1, _ref1, _results1;
               _ref1 = $scope.results;
@@ -173,6 +170,7 @@
       calculateCost = function(gBank, bank) {
         var af, mwf, myBank, rv, _i, _len, _ref;
         mwf = $scope.preferences.mwf || 2.5;
+        console.log("Checking costs for " + bank.name + ": " + bank.myFee + " vs " + bank.averageFee);
         af = bank.myFee || parseFloat(bank.averageFee) || 2.5;
         rv = -1;
         if ($scope.preferences.banks) {
@@ -232,17 +230,12 @@
         });
       };
       $scope.loadPreferences = function() {
-        console.log("Loading preferences");
         $scope.preferences = {};
-        console.log("Getting banks message");
         Preferences.get("hideBanksMessage", function(response) {
-          console.log("Retrieving preferences for banks: " + response);
           return $scope.preferences.hideBanksMessage = response;
         });
-        console.log("Getting contributor message");
         loadContributorPreference();
         Preferences.get("banks", function(response) {
-          console.log("Retrieving preferences for all banks: " + response);
           return $scope.preferences.banks = response;
         });
         return Preferences.all(function(response) {
@@ -263,9 +256,7 @@
         $scope.bank = void 0;
         return $scope.calculateFeesForResults();
       };
-      $scope.verifyUser = function() {
-        return console.log("Inside user check");
-      };
+      $scope.verifyUser = function() {};
       $scope.initialize = function() {
         $scope.verifyUser();
         $scope.loadBanks();
@@ -319,9 +310,8 @@
             zoom: 15,
             mapTypeId: google.maps.MapTypeId.ROADMAP
           };
-          $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+          return $scope.map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
         }
-        return console.log("Created map");
       };
     }
 
