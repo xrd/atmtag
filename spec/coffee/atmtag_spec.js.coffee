@@ -24,6 +24,7 @@ describe "AtmCtrl", () ->
                 ctrl = $controller( AtmCtrl, { $scope: scope, Preferences: prefs } )
                 spyOn( scope, 'search' ).andCallFake () ->
                         scope.results = results
+
         afterEach ->
             httpBackend.verifyNoOutstandingExpectation()
             httpBackend.verifyNoOutstandingRequest()
@@ -33,7 +34,7 @@ describe "AtmCtrl", () ->
                         expect( scope.banks ).toEqual undefined
                         scope.initialize()
                         httpBackend.flush()
-                        expect( scope.banks.all[0].name ).toEqual "Chris Bank"
+                        expect( scope.banks.all[0].name ).toEqual "Bank1"
 
         describe "#preferences", () ->
                 beforeEach () ->
@@ -51,18 +52,22 @@ describe "AtmCtrl", () ->
                         scope.initialize()
                         httpBackend.flush()
 
+                it "should have banks with fees estimated", ->
+                        scope.search()
+                        scope.addBank( scope.banks.all[0] )
+
                 it "should layer cost estimations based on selected banks", ->
+                        scope.search()
                         scope.addBank( scope.banks.all[0] )
                         scope.setBankFee( scope.preferences.banks[0] )
                         expect(mockPrompt).toHaveBeenCalled()
                         expect( scope.preferences.banks[0].myFee ).toEqual 1.5
                         expect( scope.results[0].fees.amount ).toEqual 3.5
 
-
                 it "should have a cost of zero if we have the bank in our banks", ->
                         scope.search()
-                        expect( scope.results[0].fees ).toEqual undefined
-                        scope.addBank(scope.banks.all[0])
+                        # expect( scope.results[0].fees ).toEqual undefined
+                        scope.addBank( scope.banks.all[0] )
                         expect( scope.results[0].fees.amount ).toEqual 0
 
         describe "#match", () ->

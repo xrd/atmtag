@@ -113,8 +113,8 @@
       $scope.help = function(result) {
         var fee, lat, lng, name;
         if (fee = window.prompt("Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations")) {
-          lat = result.geometry.location.lat;
-          lng = result.geometry.location.lng;
+          lat = result.geometry.location.lat();
+          lng = result.geometry.location.lng();
           name = result.name;
           return Bank.add_estimation({}, {
             estimation: {
@@ -126,7 +126,7 @@
             }
           }, function(response) {
             if ("ok" === response.status) {
-              return result.$scope.calculateFeesForResults();
+              return $scope.calculateFeesForResults();
             } else {
 
             }
@@ -258,6 +258,7 @@
       };
       $scope.verifyUser = function() {};
       $scope.initialize = function() {
+        $scope.results = void 0;
         $scope.verifyUser();
         $scope.loadBanks();
         $scope.loadPreferences();

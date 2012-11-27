@@ -43,7 +43,7 @@
         expect(scope.banks).toEqual(void 0);
         scope.initialize();
         httpBackend.flush();
-        return expect(scope.banks.all[0].name).toEqual("Chris Bank");
+        return expect(scope.banks.all[0].name).toEqual("Bank1");
       });
     });
     describe("#preferences", function() {
@@ -63,7 +63,12 @@
         scope.initialize();
         return httpBackend.flush();
       });
+      it("should have banks with fees estimated", function() {
+        scope.search();
+        return scope.addBank(scope.banks.all[0]);
+      });
       it("should layer cost estimations based on selected banks", function() {
+        scope.search();
         scope.addBank(scope.banks.all[0]);
         scope.setBankFee(scope.preferences.banks[0]);
         expect(mockPrompt).toHaveBeenCalled();
@@ -72,7 +77,6 @@
       });
       return it("should have a cost of zero if we have the bank in our banks", function() {
         scope.search();
-        expect(scope.results[0].fees).toEqual(void 0);
         scope.addBank(scope.banks.all[0]);
         return expect(scope.results[0].fees.amount).toEqual(0);
       });

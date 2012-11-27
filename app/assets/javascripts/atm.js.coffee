@@ -92,12 +92,12 @@ class AtmCtrl
 
                 $scope.help = (result) ->
                         if fee = window.prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
-                                lat = result.geometry.location.lat
-                                lng = result.geometry.location.lng
+                                lat = result.geometry.location.lat()
+                                lng = result.geometry.location.lng()
                                 name = result.name
                                 Bank.add_estimation {}, { estimation: { fee: fee, lat: lat, lng: lng, name: name, uid: result.id } }, (response) ->
                                         if "ok" == response.status
-                                                result.
+                                                # result.
                                                 # console.log "Registered result"
                                                 $scope.calculateFeesForResults()
                                         else
@@ -201,6 +201,7 @@ class AtmCtrl
                         # console.log "Inside user check"
 
                 $scope.initialize = () ->
+                        $scope.results = undefined
                         $scope.verifyUser()
 
                         $scope.loadBanks()
