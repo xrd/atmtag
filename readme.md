@@ -12,9 +12,9 @@ Hightlights:
 To run JS tests:
 
 * Start guard to regenerate JS files from coffeescript
-* * bundle exec guard
+  * bundle exec guard
 * Start testacular
-* * testacular config/testacular.conf.js start --auto-watch --log-level debug
+  * testacular config/testacular.conf.js start --auto-watch --log-level debug
 * Open a browser on localhost:8085
 * Make code changes in either spec/coffee/*.coffee (spec files) or in the app/assets/javascript/*.coffee files
 
