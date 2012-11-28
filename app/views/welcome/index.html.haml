@@ -11,8 +11,8 @@
       .btn.btn-large.btn-block{ 'ng-click' => 'search()' } Look up an ATM
       %small Search for the closest, cheapeast ATM
     .small{ 'ng-show' => 'results' }
-      .btn.btn-large{ 'ng-click' => 'banks.chooser = !banks.chooser' } Banks
-      .btn.btn-large{ 'ng-click' => 'search()' } Search
+      .btn.btn-large{ 'ng-click' => 'banks.chooser = !banks.chooser' } My Banks
+      .btn.btn-large{ 'ng-click' => 'search()' } Find ATMs
     .myatms{ 'ng-show' => 'preferences.banks' }
       My ATM cards:
       %span.bank.badge{ 'ng-repeat' => 'bank in preferences.banks' }
@@ -56,7 +56,7 @@
         .alert.alert-info.cost{ 'ng-class' => 'iob(result.expanded)' }
           %span{ 'ng-show' => 'result.expanded' } Your cost: 
           {{result.fees.amount|currency}}
-          %span{ 'ng-show' => 'result.expanded' }
+          %div{ 'ng-show' => 'result.expanded && result.fees.amount' }
             %span.badge.badge-important
               Estimated
             %button.btn.btn-inverse.btn-mini{ 'ng-click' => 'help(result)' } Help out.

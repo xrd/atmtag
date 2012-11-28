@@ -1,3 +1,5 @@
+DEFAULT_FEE = 2.5
+
 class AtmCtrl
         constructor: ( $scope, Bank, Preferences, $cookieStore, $location, $anchorScroll ) ->
                 # console.log "Loaded controller"
@@ -35,6 +37,17 @@ class AtmCtrl
                         if (navigator.geolocation)
                                 navigator.geolocation.getCurrentPosition( cb );
 
+                $scope.getEstimations = () ->
+                        # collect the result IDs
+                        ids = []
+                        for result in $scope.results
+                                ids.push result.id
+                        Bank.estimations { ids: ids }, (estimations) ->
+                                for estimation in estimations
+                                    for result in $scope.results
+                                        if estimation.uid == result.id
+                                                result.estimation = estimation
+
                 $scope.search = () ->
                         $scope.results = undefined
                         $scope.message = "Acquiring current location"
@@ -53,24 +66,22 @@ class AtmCtrl
                                                 $scope.attempted = true
                                                 if status == google.maps.places.PlacesServiceStatus.OK
                                                         $scope.results = results
-                                                        $scope.calculateFeesForResults()
-                                                        $scope.calculateDistances(position.coords)
+                                                        $scope.calculateFees()
+                                                        $scope.calculateDistances()
+                                                        $scope.getEstimations()
                                                         $scope.message = ""
-                                                        # Just shrink the search...
-                                                        #$location.hash('results')
-                                                        #$anchorScroll()
                                                 else
                                                         $scope.message = "No results found"
                                                 $scope.$digest()
 
-                $scope.calculateDistances = (current) ->
-
+                $scope.calculateDistances = () ->
+                        current = $scope.current
                         toRad = (Value) ->
                                 Value * Math.PI / 180
 
                         for result in $scope.results
-                                lat1 = current.latitude
-                                lon1 = current.longitude
+                                lat1 = current.lat
+                                lon1 = current.lng
                                 lat2 = result.geometry.location.lat()
                                 lon2 = result.geometry.location.lng()
                                 console.log "Lat/lng: #{lat1}/#{lon1} vs. #{lat2}/#{lon2}"
@@ -92,6 +103,7 @@ class AtmCtrl
 
                 $scope.help = (result) ->
                         if fee = window.prompt "Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations"
+                                result.taggedFee = parseFloat( fee )
                                 lat = result.geometry.location.lat()
                                 lng = result.geometry.location.lng()
                                 name = result.name
@@ -99,42 +111,52 @@ class AtmCtrl
                                         if "ok" == response.status
                                                 # result.
                                                 # console.log "Registered result"
-                                                $scope.calculateFeesForResults()
+                                                $scope.calculateFees()
                                         else
                                                 # console.log "Error"
 
                 $scope.setBankFee = (bank) ->
-                        if fee = window.prompt "What fee do you pay at this bank?"
-                                bank.myFee = fee
+                        if fee = window.prompt "What fee do you pay when you use this card at another bank?"
+                                bank.myFee = parseFloat fee
                                 console.log "Fee: #{bank.myFee}"
-                                $scope.calculateFeesForResults()
+                                $scope.calculateFees()
 
-                $scope.calculateFeesForResults = () ->
+                calculateLowestCardFee = () ->
+                        lowest = DEFAULT_FEE
+                        if $scope.preferences?.banks?.length
+                                for bank in $scope.preferences.banks
+                                        lowest = bank.myFee if bank.myFee and lowest > parseFloat( bank.myFee )
+                        parseFloat lowest
+
+                $scope.calculateFees = () ->
+                        # Get our lowest card fee
+                        $scope.lowestCardFee = calculateLowestCardFee()
+
                         # Calculate cost
                         if $scope.banks.all and $scope.results
                                 # console.log "Have banks and results loaded"
                                 for bank in $scope.banks.all
                                         # console.log "Checking #{bank.name} in all"
-                                        for gBank in $scope.results
-                                                fee = calculateCost( gBank, bank )
+                                        for result in $scope.results
+                                                fee = calculateCost( result )
                                                 # vbc == validated by count
                                                 vbc = bank.validated_by_count
-                                                gBank.fees = { amount: fee, vbc: vbc }
+                                                result.fees = { amount: fee, vbc: vbc }
 
-                calculateCost = ( gBank, bank ) ->
+                calculateCost = ( bank ) ->
                         # my withdrawal fee
-                        mwf = $scope.preferences.mwf || 2.5
-                        console.log "Checking costs for #{bank.name}: #{bank.myFee} vs #{bank.averageFee}"
-                        af = bank.myFee || parseFloat( bank.averageFee ) || 2.5
                         rv = -1
                         # Lookup our banks, and assign fees
                         if $scope.preferences.banks
                                 for myBank in $scope.preferences.banks
-                                        # console.log "Got a match of our bank #{myBank.name} / #{gBank.name}!"
-                                        if $scope.match( myBank.name, gBank.name )
-                                                # console.log "Got a match of our bank #{myBank.name} / #{gBank.name}!"
+                                        # console.log "Got a match of our bank #{myBank.name} / #{bank.name}!"
+                                        if $scope.match( myBank.name, bank.name )
+                                                console.log "Got a match of our bank #{myBank.name} / #{bank.name}, fee will be ZERO"
                                                 rv = 0.0
-                        rv = ( af + mwf ) if -1 == rv
+                        if -1 == rv
+                                bankFee = bank.taggedFee || DEFAULT_FEE
+                                rv = ( bankFee + $scope.lowestCardFee )
+                                console.log "Using default fee plus our card fee for bank #{bank.name}: #{$scope.lowestCardFee}"
                         rv
 
                 $scope.match = (bank_mixed, name_mixed) ->
@@ -156,7 +178,7 @@ class AtmCtrl
 
                 $scope.chooseBanks = () ->
                         $scope.banks.chooser = true
-                        $('.modal').css( left: '300px', top: '250px', width: '280px' )
+                        # $('.modal').css( left: '300px', top: '250px', width: '280px' )
 
                 loadContributorPreference = () ->
                         Preferences.get "contribute", (result) ->
@@ -195,7 +217,7 @@ class AtmCtrl
                         Preferences.set "banks", $scope.preferences.banks
                         $scope.bank = undefined
                         # recalculate fees
-                        $scope.calculateFeesForResults()
+                        $scope.calculateFees()
 
                 $scope.verifyUser = () ->
                         # console.log "Inside user check"
@@ -216,7 +238,7 @@ class AtmCtrl
                                 if -1 != toRemove = $scope.preferences.banks.indexOf( bank )
                                         $scope.preferences.banks.splice toRemove, 1
                                         Preferences.set "banks", $scope.preferences.banks
-                                        $scope.calculateFeesForResults()
+                                        $scope.calculateFees()
 
                 $scope.focusOnMap = (item) ->
                         if google? and google.maps?

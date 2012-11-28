@@ -8,7 +8,7 @@
     mock = void 0;
     prefs = void 0;
     beforeEach(module('atmtag'));
-    mockPrompt = jasmine.createSpy().andReturn(1.5);
+    mockPrompt = jasmine.createSpy().andReturn("1.5");
     window.prompt = mockPrompt;
     store = {};
     setStore = function(key, item) {
@@ -31,7 +31,13 @@
         Preferences: prefs
       });
       return spyOn(scope, 'search').andCallFake(function() {
-        return scope.results = results;
+        scope.results = results;
+        scope.current = {
+          lat: 50.0,
+          lng: 50.0
+        };
+        scope.calculateFees();
+        return scope.calculateDistances();
       });
     }));
     afterEach(function() {
@@ -67,13 +73,30 @@
         scope.search();
         return scope.addBank(scope.banks.all[0]);
       });
+      it("should store distances once a search is performed", function() {
+        expect(results[0].distance).toBeFalsy();
+        scope.search();
+        return expect(results[0].distance).toBeTruthy();
+      });
+      it("should find the lowest fee from all our cards", function() {
+        scope.search();
+        scope.addBank(scope.banks.all[0]);
+        scope.addBank(scope.banks.all[1]);
+        scope.setBankFee(scope.preferences.banks[0]);
+        scope.setBankFee(scope.preferences.banks[1]);
+        expect(scope.lowestCardFee).toEqual(parseFloat(1.5));
+        scope.preferences.banks[1].myFee = 1.25;
+        scope.calculateFees();
+        return expect(scope.lowestCardFee).toEqual(1.25);
+      });
       it("should layer cost estimations based on selected banks", function() {
         scope.search();
         scope.addBank(scope.banks.all[0]);
         scope.setBankFee(scope.preferences.banks[0]);
         expect(mockPrompt).toHaveBeenCalled();
         expect(scope.preferences.banks[0].myFee).toEqual(1.5);
-        return expect(scope.results[0].fees.amount).toEqual(3.5);
+        expect(scope.results[0].fees.amount).toEqual(0);
+        return expect(scope.results[1].fees.amount).toEqual(4);
       });
       return it("should have a cost of zero if we have the bank in our banks", function() {
         scope.search();

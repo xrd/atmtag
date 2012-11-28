@@ -5,6 +5,7 @@ Atmtag::Application.routes.draw do
   resources :banks do
     collection do
       post :add_estimation
+      get :estimations
     end
   end
 

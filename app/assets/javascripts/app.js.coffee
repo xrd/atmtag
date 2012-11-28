@@ -4,6 +4,7 @@ mod = angular.module "atmtag", [ 'ngCookies', 'ngResource', 'ui' ]
 mod.factory 'Bank', [ '$resource', ($resource) ->
         $resource '/banks/:id/:action', {},
                 add_estimation: { method: 'POST', params: { action: "add_estimation" }, isArray: false }
+                estimations: { method: 'GET', params: { action: 'get_estimations'}, isArray: true }
         ]
 
 mod.factory 'User', [ '$resource', ($resource) ->

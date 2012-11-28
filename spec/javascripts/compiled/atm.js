@@ -1,10 +1,12 @@
 (function() {
-  var AtmCtrl;
+  var AtmCtrl, DEFAULT_FEE;
+
+  DEFAULT_FEE = 2.5;
 
   AtmCtrl = (function() {
 
     function AtmCtrl($scope, Bank, Preferences, $cookieStore, $location, $anchorScroll) {
-      var calculateCost, loadContributorPreference;
+      var calculateCost, calculateLowestCardFee, loadContributorPreference;
       $scope.maps = {};
       $scope.attempted = false;
       $scope.radius = 500;
@@ -45,6 +47,39 @@
           return navigator.geolocation.getCurrentPosition(cb);
         }
       };
+      $scope.getEstimations = function() {
+        var ids, result, _i, _len, _ref;
+        ids = [];
+        _ref = $scope.results;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          result = _ref[_i];
+          ids.push(result.id);
+        }
+        return Bank.estimations({
+          ids: ids
+        }, function(estimations) {
+          var estimation, _j, _len1, _results;
+          _results = [];
+          for (_j = 0, _len1 = estimations.length; _j < _len1; _j++) {
+            estimation = estimations[_j];
+            _results.push((function() {
+              var _k, _len2, _ref1, _results1;
+              _ref1 = $scope.results;
+              _results1 = [];
+              for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+                result = _ref1[_k];
+                if (estimation.uid === result.id) {
+                  _results1.push(result.estimation = estimation);
+                } else {
+                  _results1.push(void 0);
+                }
+              }
+              return _results1;
+            })());
+          }
+          return _results;
+        });
+      };
       $scope.search = function() {
         $scope.results = void 0;
         $scope.message = "Acquiring current location";
@@ -65,8 +100,9 @@
               $scope.attempted = true;
               if (status === google.maps.places.PlacesServiceStatus.OK) {
                 $scope.results = results;
-                $scope.calculateFeesForResults();
-                $scope.calculateDistances(position.coords);
+                $scope.calculateFees();
+                $scope.calculateDistances();
+                $scope.getEstimations();
                 $scope.message = "";
               } else {
                 $scope.message = "No results found";
@@ -76,8 +112,9 @@
           }
         });
       };
-      $scope.calculateDistances = function(current) {
-        var R, a, c, d, dLat, dLon, lat1, lat2, lon1, lon2, result, toRad, _i, _len, _ref, _results;
+      $scope.calculateDistances = function() {
+        var R, a, c, current, d, dLat, dLon, lat1, lat2, lon1, lon2, result, toRad, _i, _len, _ref, _results;
+        current = $scope.current;
         toRad = function(Value) {
           return Value * Math.PI / 180;
         };
@@ -85,8 +122,8 @@
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           result = _ref[_i];
-          lat1 = current.latitude;
-          lon1 = current.longitude;
+          lat1 = current.lat;
+          lon1 = current.lng;
           lat2 = result.geometry.location.lat();
           lon2 = result.geometry.location.lng();
           console.log("Lat/lng: " + lat1 + "/" + lon1 + " vs. " + lat2 + "/" + lon2);
@@ -113,6 +150,7 @@
       $scope.help = function(result) {
         var fee, lat, lng, name;
         if (fee = window.prompt("Do you know the actual fee at this ATM? If so, please contribute the amount to improve estimations")) {
+          result.taggedFee = parseFloat(fee);
           lat = result.geometry.location.lat();
           lng = result.geometry.location.lng();
           name = result.name;
@@ -126,7 +164,7 @@
             }
           }, function(response) {
             if ("ok" === response.status) {
-              return $scope.calculateFeesForResults();
+              return $scope.calculateFees();
             } else {
 
             }
@@ -135,14 +173,29 @@
       };
       $scope.setBankFee = function(bank) {
         var fee;
-        if (fee = window.prompt("What fee do you pay at this bank?")) {
-          bank.myFee = fee;
+        if (fee = window.prompt("What fee do you pay when you use this card at another bank?")) {
+          bank.myFee = parseFloat(fee);
           console.log("Fee: " + bank.myFee);
-          return $scope.calculateFeesForResults();
+          return $scope.calculateFees();
         }
       };
-      $scope.calculateFeesForResults = function() {
-        var bank, fee, gBank, vbc, _i, _len, _ref, _results;
+      calculateLowestCardFee = function() {
+        var bank, lowest, _i, _len, _ref, _ref1, _ref2;
+        lowest = DEFAULT_FEE;
+        if ((_ref = $scope.preferences) != null ? (_ref1 = _ref.banks) != null ? _ref1.length : void 0 : void 0) {
+          _ref2 = $scope.preferences.banks;
+          for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+            bank = _ref2[_i];
+            if (bank.myFee && lowest > parseFloat(bank.myFee)) {
+              lowest = bank.myFee;
+            }
+          }
+        }
+        return parseFloat(lowest);
+      };
+      $scope.calculateFees = function() {
+        var bank, fee, result, vbc, _i, _len, _ref, _results;
+        $scope.lowestCardFee = calculateLowestCardFee();
         if ($scope.banks.all && $scope.results) {
           _ref = $scope.banks.all;
           _results = [];
@@ -153,10 +206,10 @@
               _ref1 = $scope.results;
               _results1 = [];
               for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                gBank = _ref1[_j];
-                fee = calculateCost(gBank, bank);
+                result = _ref1[_j];
+                fee = calculateCost(result);
                 vbc = bank.validated_by_count;
-                _results1.push(gBank.fees = {
+                _results1.push(result.fees = {
                   amount: fee,
                   vbc: vbc
                 });
@@ -167,23 +220,23 @@
           return _results;
         }
       };
-      calculateCost = function(gBank, bank) {
-        var af, mwf, myBank, rv, _i, _len, _ref;
-        mwf = $scope.preferences.mwf || 2.5;
-        console.log("Checking costs for " + bank.name + ": " + bank.myFee + " vs " + bank.averageFee);
-        af = bank.myFee || parseFloat(bank.averageFee) || 2.5;
+      calculateCost = function(bank) {
+        var bankFee, myBank, rv, _i, _len, _ref;
         rv = -1;
         if ($scope.preferences.banks) {
           _ref = $scope.preferences.banks;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             myBank = _ref[_i];
-            if ($scope.match(myBank.name, gBank.name)) {
+            if ($scope.match(myBank.name, bank.name)) {
+              console.log("Got a match of our bank " + myBank.name + " / " + bank.name + ", fee will be ZERO");
               rv = 0.0;
             }
           }
         }
         if (-1 === rv) {
-          rv = af + mwf;
+          bankFee = bank.taggedFee || DEFAULT_FEE;
+          rv = bankFee + $scope.lowestCardFee;
+          console.log("Using default fee plus our card fee for bank " + bank.name + ": " + $scope.lowestCardFee);
         }
         return rv;
       };
@@ -210,12 +263,7 @@
         return rv;
       };
       $scope.chooseBanks = function() {
-        $scope.banks.chooser = true;
-        return $('.modal').css({
-          left: '300px',
-          top: '250px',
-          width: '280px'
-        });
+        return $scope.banks.chooser = true;
       };
       loadContributorPreference = function() {
         return Preferences.get("contribute", function(result) {
@@ -254,7 +302,7 @@
         $scope.preferences.banks.push(bank);
         Preferences.set("banks", $scope.preferences.banks);
         $scope.bank = void 0;
-        return $scope.calculateFeesForResults();
+        return $scope.calculateFees();
       };
       $scope.verifyUser = function() {};
       $scope.initialize = function() {
@@ -273,7 +321,7 @@
           if (-1 !== (toRemove = $scope.preferences.banks.indexOf(bank))) {
             $scope.preferences.banks.splice(toRemove, 1);
             Preferences.set("banks", $scope.preferences.banks);
-            return $scope.calculateFeesForResults();
+            return $scope.calculateFees();
           }
         }
       };

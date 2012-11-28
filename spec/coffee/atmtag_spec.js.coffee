@@ -7,7 +7,8 @@ describe "AtmCtrl", () ->
         prefs = undefined
 
         beforeEach( module( 'atmtag' ) )
-        mockPrompt = jasmine.createSpy().andReturn( 1.5 )
+        # Send back a string to make sure we catch errors with strings vs. integers
+        mockPrompt = jasmine.createSpy().andReturn( "1.5" )
         window.prompt = mockPrompt
 
         store = {}
@@ -24,6 +25,9 @@ describe "AtmCtrl", () ->
                 ctrl = $controller( AtmCtrl, { $scope: scope, Preferences: prefs } )
                 spyOn( scope, 'search' ).andCallFake () ->
                         scope.results = results
+                        scope.current =  lat: 50.0, lng: 50.0
+                        scope.calculateFees()
+                        scope.calculateDistances()
 
         afterEach ->
             httpBackend.verifyNoOutstandingExpectation()
@@ -56,17 +60,36 @@ describe "AtmCtrl", () ->
                         scope.search()
                         scope.addBank( scope.banks.all[0] )
 
+                it "should store distances once a search is performed", ->
+                        expect( results[0].distance ).toBeFalsy()
+                        scope.search()
+                        expect( results[0].distance ).toBeTruthy()
+
+                it "should find the lowest fee from all our cards", ->
+                        scope.search()
+                        scope.addBank( scope.banks.all[0] )
+                        scope.addBank( scope.banks.all[1] )
+                        scope.setBankFee( scope.preferences.banks[0] )
+                        scope.setBankFee( scope.preferences.banks[1] )
+                        # current fee should be default
+                        expect( scope.lowestCardFee ).toEqual parseFloat( 1.5 )
+                        scope.preferences.banks[1].myFee = 1.25
+                        scope.calculateFees()
+                        expect( scope.lowestCardFee ).toEqual 1.25
+
                 it "should layer cost estimations based on selected banks", ->
                         scope.search()
                         scope.addBank( scope.banks.all[0] )
                         scope.setBankFee( scope.preferences.banks[0] )
                         expect(mockPrompt).toHaveBeenCalled()
                         expect( scope.preferences.banks[0].myFee ).toEqual 1.5
-                        expect( scope.results[0].fees.amount ).toEqual 3.5
+                        # First bank (in our preferences) should be zero
+                        expect( scope.results[0].fees.amount ).toEqual 0
+                        # Second bank, not in our preferences, should be our card fee plus their fee (1.5 + 2.5)
+                        expect( scope.results[1].fees.amount ).toEqual 4
 
                 it "should have a cost of zero if we have the bank in our banks", ->
                         scope.search()
-                        # expect( scope.results[0].fees ).toEqual undefined
                         scope.addBank( scope.banks.all[0] )
                         expect( scope.results[0].fees.amount ).toEqual 0
 

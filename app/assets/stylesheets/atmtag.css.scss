@@ -28,9 +28,11 @@ $bank: #ddd;
 .evenBank, .oddBank {
     padding: 1em;
 }
+.oddBank {
+background-color: lighten( $bank, 10% );
+}
 .evenBank {
-
-background-color: lighten( $bank, 20% );
+background-color: $bank;
 }
 
 .order, .search, .myatms {
@@ -44,10 +46,6 @@ text-align: right;
 
 .icon {
 transform:scale(0.5,0.5);
-}
-
-.oddBank {
-background-color: $bank;
 }
 
 .extras {

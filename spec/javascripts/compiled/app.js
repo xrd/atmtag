@@ -14,6 +14,13 @@
             action: "add_estimation"
           },
           isArray: false
+        },
+        estimations: {
+          method: 'GET',
+          params: {
+            action: 'get_estimations'
+          },
+          isArray: true
         }
       });
     }
