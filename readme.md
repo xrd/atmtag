@@ -1,5 +1,4 @@
-
-AtmTag: a fun little AngularJS/Rails application for searching for the most inexpensive and closest ATM
+AtmTag: a fun little AngularJS/Rails application for searching for the most inexpensive and closest ATM. Entered into the Google Places API competition in November of 2012.
 
 Hightlights:
 * Jasmine testing
