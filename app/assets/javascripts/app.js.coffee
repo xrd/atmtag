@@ -19,20 +19,15 @@ mod.config [ '$httpProvider', ($httpProvider) ->
                 $httpProvider.defaults.headers.common[ 'X-CSRF-TOKEN' ] = authToken
         ]
 
+
 mod.factory 'Preferences', [ (store) ->
-        console.log "Creating store service (lawnchair)"
+        $.cookie.json = true
         store = {}
-        Lawnchair name: 'atmtag', (lawnchair) ->
-                store.get = ( key, cb ) ->
-                        console.log "Getting preference for: #{key}"
-                        lawnchair.get key, (response) ->
-                                value = response.value if response?
-                                console.log "Got #{key} => #{value}"
-                                cb(value)
-                store.set = ( key, value ) ->
-                        console.log "Setting preference for: #{key} to #{value}"
-                        lawnchair.save key: key, value: value
-                store.all = (cb) ->
-                        lawnchair.all(cb)
+        store.get = ( key ) ->
+                $.cookie key
+
+        store.set = ( key, value ) ->
+                $.cookie key, value, expires: 365*10
+                console.log "Setting preference for: #{key} to #{value}"
         store
         ]

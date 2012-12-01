@@ -180,31 +180,12 @@ class AtmCtrl
                         $scope.banks.chooser = true
                         # $('.modal').css( left: '300px', top: '250px', width: '280px' )
 
-                loadContributorPreference = () ->
-                        Preferences.get "contribute", (result) ->
-                                console.log "Retrieving contribute #{result}"
-                                $scope.preferences.contribute = result
-                                unless result
-                                        Preferences.set "contribute", "yes"
-                                        $scope.preferences.contribute = "yes"
-                                else
-                                        console.log "Defined: #{$scope.preferences.contribute}"
-
                 $scope.loadPreferences = () ->
                         #console.log "Loading preferences"
                         $scope.preferences = {}
                         #console.log "Getting banks message"
-                        Preferences.get "hideBanksMessage", (response) ->
-                                #console.log "Retrieving preferences for banks: #{response}"
-                                $scope.preferences.hideBanksMessage = response
-                        #console.log "Getting contributor message"
-                        loadContributorPreference()
-                        Preferences.get "banks", (response) ->
-                                #console.log "Retrieving preferences for all banks: #{response}"
-                                $scope.preferences.banks = response
-
-                        Preferences.all (response) ->
-                                $scope.allPrefs = response
+                        $scope.preferences.hideBanksMessage = Preferences.get "hideBanksMessage"
+                        $scope.preferences.banks = Preferences.get "banks"
 
                 $scope.loadBanks = () ->
                         $scope.banks = {}

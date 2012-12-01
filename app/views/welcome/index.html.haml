@@ -1,10 +1,5 @@
 .atm
   .actions
-    .bank.alert.alert-error{ 'ng-show' => '!preferences.hideBanksMessage && !preferences.banks' } 
-      Select your banks and AtmTag will calculate ATM fees for each ATM we find near you.
-      .choices
-        .btn.btn-small{ 'ng-click' => 'banks.chooser = !banks.chooser' } Select your banks
-        .btn.btn-mini.btn-inverse.pull-right{ 'ng-click' => 'hideBanksMessage()' } Hide this message
     .large{ 'ng-hide' => 'results' }
       .btn.btn-large.btn-block{ 'ng-click' => 'chooseBanks()' } Choose your banks
       %small Choosing your bank allows us to calculate the least expensive ATM for you.
